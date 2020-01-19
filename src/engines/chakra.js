@@ -54,10 +54,12 @@ class ChakraInstaller extends Installer {
 
   async install() {
     if (platform.startsWith('win')) {
-      await this.registerAssets('ChakraCoreFiles/*.pdb');
-      await this.registerAssets('ChakraCoreFiles/*.dll');
-      const ch = await this.registerBinary('ChakraCoreFiles/ch.exe');
-      await this.registerScript('chakra', `"${ch}"`);
+      const root = platform === 'win32' ? 'x86_release' : 'x64_release';
+      await this.registerAssets(`${root}/*.pdb`);
+      await this.registerAssets(`${root}/*.dll`);
+      const ch = await this.registerAsset(`${root}/ch.exe`);
+      await this.registerScript('ch', `"${ch}"`);
+      this.binPath = await this.registerScript('chakra', `"${ch}"`);
     } else {
       await this.registerAssets('ChakraCoreFiles/lib/*');
       this.binPath = await this.registerBinary('ChakraCoreFiles/bin/ch', 'chakra');

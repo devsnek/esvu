@@ -68,7 +68,7 @@ class EngineInstaller {
       });
     });
     for (const file of files) {
-      await this.registerAsset(file.replace(`${this.extractedLocation}/`, ''));
+      await this.registerAsset(path.relative(this.extractedLocation, file));
     }
   }
 
@@ -83,7 +83,7 @@ class EngineInstaller {
 
   async registerBinary(name, alias = name) {
     const full = await this.registerAsset(name);
-    return this.registerBinarySymlink(full, alias);
+    return this.registerBinarySymlink(full, path.basename(alias));
   }
 
   async registerBinarySymlink(from, name) {
@@ -98,7 +98,7 @@ class EngineInstaller {
     let source;
     if (platform.startsWith('win')) {
       name += '.cmd';
-      source = `@echo off\r\n${source} %*\r\n`;
+      source = `@echo off\r\n${body} %*\r\n`;
     } else {
       source = `#!/usr/bin/env bash\n${body} "$@"\n`;
     }

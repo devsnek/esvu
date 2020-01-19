@@ -96,11 +96,12 @@ class JavaScriptCoreInstaller extends Installer {
       }
       case 'win32':
       case 'win64': {
-        await this.registerAssets('JavaScriptCore.resources/*');
-        await this.registerAssets('*.dll');
-        await this.registerAssets('*.pdb');
-        this.binPath = await this.registerBinary('jsc.exe', 'javascriptcore');
-        await this.registerScript('jsc', `"${this.binPath}"`);
+        await this.registerAssets('bin64/JavaScriptCore.resources/*');
+        await this.registerAssets('bin64/*.dll');
+        await this.registerAssets('bin64/*.pdb');
+        const jsc = await this.registerAsset('bin64/jsc.exe');
+        this.binPath = await this.registerScript('javascriptcore', `"${jsc}"`);
+        await this.registerScript('jsc', `"${jsc}"`);
         break;
       }
       default:

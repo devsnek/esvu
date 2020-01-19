@@ -58,7 +58,7 @@ class V8Installer extends Installer {
   async install() {
     await this.registerAsset('icudtl.dat');
     const snapshot = await this.registerAsset('snapshot_blob.bin');
-    const d8 = await this.registerAsset('d8');
+    const d8 = await this.registerAsset(platform.startsWith('win') ? 'd8.exe' : 'd8');
     this.v8Path = await this.registerScript('v8', `"${d8}" --snapshot_blob="${snapshot}"`);
   }
 

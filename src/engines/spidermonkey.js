@@ -72,7 +72,8 @@ class SpiderMonkeyInstaller extends Installer {
       case 'win32':
       case 'win64': {
         await this.registerAssets('*.dll');
-        const sm = await this.registerBinary('js.exe', 'spidermonkey.exe');
+        const sm = await this.registerAsset('js.exe');
+        this.binPath = await this.registerScript('spidermonkey', `"${sm}"`);
         await this.registerScript('sm', `"${sm}"`);
         break;
       }

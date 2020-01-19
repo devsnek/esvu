@@ -50,7 +50,7 @@ class XSInstaller extends Installer {
   async install() {
     if (platform.startsWith('win')) {
       const xst = await this.registerAsset('xst.exe');
-      this.binPath = await this.installScript('xs', `"${xst}"`);
+      this.binPath = await this.registerScript('xs', `"${xst}"`);
     } else {
       this.binPath = await this.registerBinary('xst', 'xs');
     }
