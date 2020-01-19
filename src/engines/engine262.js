@@ -16,7 +16,7 @@ class Engine262Installer extends Installer {
 
   static resolveVersion(version) {
     if (version === 'latest') {
-      return fetch('https://api.engine262.js.org/download')
+      return fetch('https://api.engine262.js.org/latest-version')
         .then((r) => r.json())
         .then((b) => b.latest);
     }
@@ -24,9 +24,7 @@ class Engine262Installer extends Installer {
   }
 
   getDownloadURL(version) {
-    return fetch(`https://api.engine262.js.org/download?version=${version}`)
-      .then((r) => r.json())
-      .then((b) => b.tarball);
+    return `https://api.engine262.js.org/download?version=${version}`;
   }
 
   async extract(from) {
