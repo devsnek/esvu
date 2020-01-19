@@ -1,0 +1,88 @@
+'use strict';
+
+const fs = require('fs');
+const assert = require('assert');
+const os = require('os');
+const path = require('path');
+const fetch = require('node-fetch');
+const execa = require('execa');
+const Installer = require('../installer');
+const { platform, ensureDirectory, unzip, untar } = require('../common');
+
+function getFilename() {
+  switch (platform) {
+    case 'darwin64':
+      return 'osx_x64';
+    case 'linux64':
+      return 'linux_x64';
+    case 'win32':
+    case 'win64':
+      return 'windows_all';
+    default:
+      throw new Error(`No Chakra builds available for ${platform}`);
+  }
+}
+
+class ChakraInstaller extends Installer {
+  constructor(...args) {
+    super(...args);
+
+    this.binPath = undefined;
+  }
+
+  static resolveVersion(version) {
+    if (version === 'latest') {
+      return fetch('https://aka.ms/chakracore/version')
+        .then((r) => r.text())
+        .then((t) => t.trim());
+    }
+    return version;
+  }
+
+  getDownloadURL(version) {
+    return `https://aka.ms/chakracore/cc_${getFilename()}_${version}`;
+  }
+
+  async extract(from, to) {
+    if (platform.startsWith('win')) {
+      await unzip(from, to);
+    } else {
+      await ensureDirectory(to);
+      await untar(from, to);
+    }
+  }
+
+  async install() {
+    if (platform.startsWith('win')) {
+      await this.registerAssets('ChakraCoreFiles/*.pdb');
+      await this.registerAssets('ChakraCoreFiles/*.dll');
+      const ch = await this.registerBinary('ChakraCoreFiles/ch.exe');
+      await this.registerScript('chakra', `"${ch}"`);
+    } else {
+      await this.registerAssets('ChakraCoreFiles/lib/*');
+      this.binPath = await this.registerBinary('ChakraCoreFiles/bin/ch', 'chakra');
+      await this.registerAsset('ChakraCoreFiles/LICENSE');
+    }
+  }
+
+  async test() {
+    const program = 'print("42");';
+    const output = '42';
+
+    const file = path.join(os.tmpdir(), 'esvu_chakra_test.js');
+
+    fs.writeFileSync(file, program);
+
+    assert.strictEqual(
+      (await execa(this.binPath, [file])).stdout,
+      output,
+    );
+  }
+}
+
+ChakraInstaller.config = {
+  name: 'Chakra',
+  id: 'ch',
+};
+
+module.exports = ChakraInstaller;

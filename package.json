@@ -1,0 +1,37 @@
+{
+  "name": "esvu",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.js",
+  "dependencies": {
+    "execa": "^4.0.0",
+    "extract-zip": "^1.6.7",
+    "glob": "^7.1.6",
+    "inquirer": "^7.0.3",
+    "node-fetch": "^2.6.0",
+    "ora": "^4.0.3",
+    "tar": "^5.0.5"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0"
+  },
+  "bin": {
+    "esvu": "./src/bin.js"
+  },
+  "scripts": {
+    "lint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devsnek/esvu.git"
+  },
+  "author": "snek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devsnek/esvu/issues"
+  },
+  "homepage": "https://github.com/devsnek/esvu#readme"
+}
