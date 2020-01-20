@@ -59,7 +59,7 @@ class EngineInstaller {
   async registerAssets(pattern) {
     const full = path.join(this.extractedLocation, pattern);
     const files = await new Promise((resolve, reject) => {
-      glob(full, (err, list) => {
+      glob(full, { nodir: true }, (err, list) => {
         if (err) {
           reject(err);
         } else {

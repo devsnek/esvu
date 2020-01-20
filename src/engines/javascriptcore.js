@@ -78,9 +78,9 @@ class JavaScriptCoreInstaller extends Installer {
   async install() {
     switch (platform) {
       case 'darwin64': {
-        await this.registerAssets('JavaScriptCore.framework/*');
-        const jsc = await this.registerAsset('jsc');
-        const source = `DYLD_FRAMEWORK_PATH="${this.finalLocation}" DYLD_LIBRARY_PATH="${this.stargetLocation}" "${jsc}"`;
+        await this.registerAssets('Release/JavaScriptCore.framework/**');
+        const jsc = await this.registerAsset('Release/jsc');
+        const source = `DYLD_FRAMEWORK_PATH="${this.finalLocation}/Release" DYLD_LIBRARY_PATH="${this.finalLocation}/Release" "${jsc}"`;
         this.binPath = await this.registerScript('javascriptcore', source);
         await this.registerScript('jsc', source);
         break;
