@@ -35,7 +35,7 @@ class EngineInstaller {
     status.update(`Downloading ${url}`);
     const location = await fetch(url)
       .then(async (r) => {
-        const l = path.join(os.tmpdir(), hash(url));
+        const l = path.join(os.tmpdir(), hash(url) + path.extname(url));
         const sink = fs.createWriteStream(l);
         await new Promise((resolve, reject) => {
           r.body.pipe(sink)
@@ -67,9 +67,8 @@ class EngineInstaller {
         }
       });
     });
-    for (const file of files) {
-      await this.registerAsset(path.relative(this.extractedLocation, file));
-    }
+    await Promise.all(files.map((file) =>
+      this.registerAsset(path.relative(this.extractedLocation, file))));
   }
 
   async registerAsset(name) {

@@ -36,7 +36,7 @@ class QuickJSInstaller extends Installer {
   }
 
   extract(from, to) {
-    unzip(from, to);
+    return unzip(from, to);
   }
 
   async install() {

@@ -95,11 +95,13 @@ OPTIONS:
           spinner.render();
         },
         pass(t) {
+          process.stdout.write('\n');
           spinner.succeed(t);
         },
       });
       status.installed[engine] = version;
     } catch (e) {
+      process.stdout.write('\n');
       spinner.fail(e.stack);
     }
   }
