@@ -61,7 +61,7 @@ class SpiderMonkeyInstaller extends Installer {
       case 'darwin64':
         await this.registerAssets('*.dylib');
         await this.registerBinary('js', 'sm');
-        await this.registerBinary('js', 'spidermonkey');
+        this.binPath = await this.registerBinary('js', 'spidermonkey');
         break;
       case 'linux32':
       case 'linux64':
