@@ -43,12 +43,12 @@ class ChakraInstaller extends Installer {
     return `https://aka.ms/chakracore/cc_${getFilename()}_${version}`;
   }
 
-  async extract(from, to) {
+  async extract() {
     if (platform.startsWith('win')) {
-      await unzip(from, to);
+      await unzip(this.downloadPath, this.extractedPath);
     } else {
-      await ensureDirectory(to);
-      await untar(from, to);
+      await ensureDirectory(this.extractedPath);
+      await untar(this.downloadPath, this.extractedPath);
     }
   }
 

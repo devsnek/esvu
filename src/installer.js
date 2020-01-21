@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const path = require('path');
 const glob = require('glob');
 const fetch = require('node-fetch');
+const rimraf = require('rimraf');
 const { ESVU_PATH, ensureDirectory, symlink, platform } = require('./common');
 
 function hash(string) {
@@ -18,7 +19,9 @@ function hash(string) {
 
 class EngineInstaller {
   constructor(status) {
-    this.finalLocation = path.join(ESVU_PATH, 'engines', this.constructor.config.id);
+    this.downloadPath = undefined;
+    this.extractedPath = undefined;
+    this.installPath = path.join(ESVU_PATH, 'engines', this.constructor.config.id);
     this.status = status;
   }
 
@@ -30,12 +33,15 @@ class EngineInstaller {
         process.stdout.write(`  ${e.name} - ${e.url}\n`);
       });
     }
+
     status.update(`Installing version ${version}`);
+
     const url = await installer.getDownloadURL(version);
     status.update(`Downloading ${url}`);
-    const location = await fetch(url)
+    installer.downloadPath = await fetch(url)
       .then(async (r) => {
-        const l = path.join(os.tmpdir(), hash(url) + path.extname(url));
+        const rURL = new URL(r.url);
+        const l = path.join(os.tmpdir(), hash(url) + path.extname(rURL.pathname));
         const sink = fs.createWriteStream(l);
         await new Promise((resolve, reject) => {
           r.body.pipe(sink)
@@ -44,15 +50,20 @@ class EngineInstaller {
         });
         return l;
       });
-    status.update(`Extracting from ${location}`);
-    await ensureDirectory(installer.finalLocation);
+    installer.extractedPath = `${installer.downloadPath}-extracted`;
+
+    status.update(`Extracting from ${installer.downloadPath}`);
+    await ensureDirectory(installer.installPath);
     await ensureDirectory(path.join(ESVU_PATH, 'bin'));
-    installer.extractedLocation = `${location}-extracted`;
-    await installer.extract(location, installer.extractedLocation);
-    status.update(`Installing from ${installer.extractedLocation}`);
+    await installer.extract();
+
+    status.update(`Installing from ${installer.extractedPath}`);
     await installer.install();
+
     status.update('Testing engine');
     await installer.test();
+
+    await installer.cleanup();
     status.pass(`Installed version ${version}`);
   }
 
@@ -63,8 +74,23 @@ class EngineInstaller {
     return true;
   }
 
+  cleanup() {
+    return Promise.all([
+      fs.promises.unlink(this.downloadPath),
+      new Promise((resolve, reject) => {
+        rimraf(this.extractedPath, (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }),
+    ]);
+  }
+
   async registerAssets(pattern) {
-    const full = path.join(this.extractedLocation, pattern);
+    const full = path.join(this.extractedPath, pattern);
     const files = await new Promise((resolve, reject) => {
       glob(full, { nodir: true }, (err, list) => {
         if (err) {
@@ -75,13 +101,13 @@ class EngineInstaller {
       });
     });
     await Promise.all(files.map((file) =>
-      this.registerAsset(path.relative(this.extractedLocation, file))));
+      this.registerAsset(path.relative(this.extractedPath, file))));
   }
 
   async registerAsset(name) {
     this.status.update(`Registering asset ${name}`);
-    const full = path.join(this.extractedLocation, name);
-    const out = path.join(this.finalLocation, name);
+    const full = path.join(this.extractedPath, name);
+    const out = path.join(this.installPath, name);
     await ensureDirectory(path.dirname(out));
     await fs.promises.copyFile(full, out);
     return out;

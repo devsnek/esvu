@@ -51,8 +51,8 @@ class V8Installer extends Installer {
     return `https://storage.googleapis.com/chromium-v8/official/canary/v8-${getFilename(platform)}-rel-${version}.zip`;
   }
 
-  extract(from, to) {
-    return unzip(from, to);
+  extract() {
+    return unzip(this.downloadPath, this.extractedPath);
   }
 
   async install() {

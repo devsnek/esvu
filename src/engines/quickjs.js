@@ -35,8 +35,8 @@ class QuickJSInstaller extends Installer {
     return `https://bellard.org/quickjs/binary_releases/quickjs-${getFilename()}-${version}.zip`;
   }
 
-  extract(from, to) {
-    return unzip(from, to);
+  extract() {
+    return unzip(this.downloadPath, this.extractedPath);
   }
 
   async install() {

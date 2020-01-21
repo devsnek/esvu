@@ -84,7 +84,7 @@ OPTIONS:
     .on('exit', onExit)
     .on('SIGINT', onExit);
 
-  process.stdout.write(`Installing ${status.engines.join(', ')}\n`);
+  process.stdout.write(`Installing ${status.engines.map((e) => engines[e].config.name).join(', ')}\n`);
 
   for (const engine of status.engines) {
     const Installer = engines[engine];

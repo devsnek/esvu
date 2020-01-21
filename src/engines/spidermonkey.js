@@ -52,8 +52,8 @@ class SpiderMonkeyInstaller extends Installer {
     return `https://archive.mozilla.org/pub/firefox/releases/${version}/jsshell/jsshell-${getFilename()}.zip`;
   }
 
-  extract(from, to) {
-    return unzip(from, to);
+  extract() {
+    return unzip(this.downloadPath, this.extractedPath);
   }
 
   async install() {
@@ -67,7 +67,7 @@ class SpiderMonkeyInstaller extends Installer {
       case 'linux64':
         await this.registerAssets('*.so');
         this.binPath = await this.registerBinary('js', 'spidermonkey');
-        await this.registerScript('sm', `LD_LIBRARY_PATH="${this.finalLocation}" "${this.binPath}"`);
+        await this.registerScript('sm', `LD_LIBRARY_PATH="${this.installPath}" "${this.binPath}"`);
         break;
       case 'win32':
       case 'win64': {

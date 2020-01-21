@@ -27,12 +27,12 @@ class Engine262Installer extends Installer {
     return `https://api.engine262.js.org/download?version=${version}`;
   }
 
-  async extract(from) {
-    await untar(from, this.finalLocation);
+  async extract() {
+    await untar(this.downloadPath, this.installPath);
   }
 
   async install() {
-    const bin = path.join(this.finalLocation, 'package', 'bin', 'engine262.js');
+    const bin = path.join(this.installPath, 'package', 'bin', 'engine262.js');
     this.binPath = await this.registerBinarySymlink(bin, 'engine262');
   }
 

@@ -71,8 +71,8 @@ class JavaScriptCoreInstaller extends Installer {
     }
   }
 
-  extract(from, to) {
-    return unzip(from, to);
+  extract() {
+    return unzip(this.downloadPath, this.extractedPath);
   }
 
   async install() {
@@ -80,7 +80,7 @@ class JavaScriptCoreInstaller extends Installer {
       case 'darwin64': {
         await this.registerAssets('Release/JavaScriptCore.framework/**');
         const jsc = await this.registerAsset('Release/jsc');
-        const source = `DYLD_FRAMEWORK_PATH="${this.finalLocation}/Release" DYLD_LIBRARY_PATH="${this.finalLocation}/Release" "${jsc}"`;
+        const source = `DYLD_FRAMEWORK_PATH="${this.installPath}/Release" DYLD_LIBRARY_PATH="${this.installPath}/Release" "${jsc}"`;
         this.binPath = await this.registerScript('javascriptcore', source);
         await this.registerScript('jsc', source);
         break;
@@ -89,7 +89,7 @@ class JavaScriptCoreInstaller extends Installer {
       case 'linux64': {
         await this.registerAssets('lib/*');
         const jsc = await this.registerAsset('bin/jsc');
-        const source = `LD_LIBRARY_PATH="${this.finalLocation}/lib" exec "${this.finalLocation}/lib/ld-linux${platform === 'linux64' ? '-x86-64' : ''}.so.2" "${jsc}"`;
+        const source = `LD_LIBRARY_PATH="${this.installPath}/lib" exec "${this.installPath}/lib/ld-linux${platform === 'linux64' ? '-x86-64' : ''}.so.2" "${jsc}"`;
         this.binPath = await this.registerScript('javascriptcore', source);
         await this.registerScript('jsc', source);
         break;

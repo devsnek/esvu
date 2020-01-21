@@ -43,8 +43,8 @@ class XSInstaller extends Installer {
     return `https://github.com/Moddable-OpenSource/moddable-xst/releases/download/v${version}/xst-${getFilename()}.zip`;
   }
 
-  extract(from, to) {
-    return unzip(from, to);
+  extract() {
+    return unzip(this.downloadPath, this.extractedPath);
   }
 
   async install() {
