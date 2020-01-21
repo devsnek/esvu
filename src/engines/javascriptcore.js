@@ -131,8 +131,9 @@ JavaScriptCoreInstaller.config = {
   ] : undefined,
   supported: [
     'linux32', 'linux64',
-    'win32', 'win64',
     'darwin64',
+    // external requirements, don't install by default
+    // 'win32', 'win64',
   ],
 };
 
