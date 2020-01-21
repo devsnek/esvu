@@ -18,4 +18,5 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm install
-      - run: node src/bin.js
+      - run: npm run lint
+      - run: node src/bin.js --engines=all

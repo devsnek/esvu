@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const ora = require('ora');
 const inquirer = require('inquirer');
+const { argv } = require('yargs');
 const { engines } = require('.');
 const { ESVU_PATH } = require('./common');
 const packageJson = require('../package.json');
@@ -16,6 +17,20 @@ const packageJson = require('../package.json');
 process.stdout.write(`esvu v${packageJson.version}\n`);
 
 const STATUS_PATH = path.join(ESVU_PATH, 'status.json');
+
+async function promptForEngines() {
+  const { selectedEngines } = await inquirer.prompt({
+    name: 'selectedEngines',
+    type: 'checkbox',
+    message: 'Which engines would you like to install?',
+    choices: Object.keys(engines).map((e) => ({
+      name: engines[e].config.name,
+      value: e,
+      checked: true,
+    })),
+  });
+  return selectedEngines;
+}
 
 (async function main() {
   if (process.argv.find((a) => a === '--help' || a === '-h')) {
@@ -35,18 +50,18 @@ OPTIONS:
     const source = await fs.promises.readFile(STATUS_PATH, 'utf8');
     status = JSON.parse(source);
   } catch {
-    const { step } = await inquirer.prompt({
-      name: 'step',
-      type: 'checkbox',
-      message: 'Which engines would you like to install?',
-      choices: Object.keys(engines).map((e) => ({
-        name: engines[e].config.name,
-        value: e,
-        checked: true,
-      })),
-    });
+    let selectedEngines;
+    if (argv.engines) {
+      if (argv.engines === 'all') {
+        selectedEngines = Object.keys(engines);
+      } else {
+        selectedEngines = argv.engines.split(',');
+      }
+    } else {
+      selectedEngines = await promptForEngines();
+    }
     status = {
-      engines: step,
+      engines: selectedEngines,
       installed: {},
     };
   }
