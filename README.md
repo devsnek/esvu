@@ -17,6 +17,13 @@ The first time you run `esvu`, it will ask you which engines you wish to
 install. After the first run, running `esvu` will update the engines you
 selected.
 
+- `$ esvu`
+  Update all installed engines, or select engines to install
+- `$ esvu install <engine>`
+  Install the engine `<engine>`
+- `$ esvu uninstall <engine>`
+  Uninstall `<engine>`
+
 
 | Engine             | Binary Names¹                    | `darwin64` | `linux32` | `linux64` | `win32` | `win64` |
 |--------------------|----------------------------------|------------|-----------|-----------|---------|---------|

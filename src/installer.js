@@ -8,8 +8,7 @@ const crypto = require('crypto');
 const path = require('path');
 const glob = require('glob');
 const fetch = require('node-fetch');
-const rimraf = require('rimraf');
-const { ESVU_PATH, ensureDirectory, symlink, platform } = require('./common');
+const { ESVU_PATH, ensureDirectory, symlink, platform, rmdir } = require('./common');
 
 function hash(string) {
   const h = crypto.createHash('md5');
@@ -18,16 +17,16 @@ function hash(string) {
 }
 
 class EngineInstaller {
-  constructor(version, status) {
+  constructor(version) {
     this.version = version;
-    this.status = status;
     this.downloadPath = undefined;
     this.extractedPath = undefined;
     this.installPath = path.join(ESVU_PATH, 'engines', this.constructor.config.id);
+    this.binEntries = [];
   }
 
   static async install(version, status) {
-    const installer = new this(version, status);
+    const installer = new this(version);
     if (this.config.externalRequirements) {
       process.stdout.write(`\n! ${this.config.name} has external requirements which may need to be installed separately:\n`);
       this.config.externalRequirements.forEach((e) => {
@@ -65,7 +64,8 @@ class EngineInstaller {
     await installer.test();
 
     await installer.cleanup();
-    status.pass(`Installed version ${version}`);
+
+    return installer.binEntries;
   }
 
   static isSupported() {
@@ -78,15 +78,7 @@ class EngineInstaller {
   cleanup() {
     return Promise.all([
       fs.promises.unlink(this.downloadPath),
-      new Promise((resolve, reject) => {
-        rimraf(this.extractedPath, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      }),
+      rmdir(this.extractedPath),
     ]);
   }
 
@@ -106,7 +98,6 @@ class EngineInstaller {
   }
 
   async registerAsset(name) {
-    this.status.update(`Registering asset ${name}`);
     const full = path.join(this.extractedPath, name);
     const out = path.join(this.installPath, name);
     await ensureDirectory(path.dirname(out));
@@ -120,14 +111,13 @@ class EngineInstaller {
   }
 
   async registerBinarySymlink(from, name) {
-    this.status.update(`Registering binary ${name}`);
     const bin = path.join(ESVU_PATH, 'bin', name);
     await symlink(from, bin);
+    this.binEntries.push(name);
     return bin;
   }
 
   async registerScript(name, body) {
-    this.status.update(`Registering script ${name}`);
     let source;
     if (platform.startsWith('win')) {
       name += '.cmd';
@@ -139,6 +129,7 @@ class EngineInstaller {
     await fs.promises.writeFile(full, source, {
       mode: 0o755,
     });
+    this.binEntries.push(name);
     return full;
   }
 }

@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const extractZip = require('extract-zip');
 const tar = require('tar');
+const rimraf = require('rimraf');
 
 const ESVU_PATH = path.join(os.homedir(), '.esvu');
 
@@ -30,6 +31,18 @@ async function symlink(target, dest) {
     // x
   }
   await fs.promises.symlink(target, dest);
+}
+
+function rmdir(dir) {
+  return new Promise((resolve, reject) => {
+    rimraf(dir, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 function guessPlatform() {
@@ -59,6 +72,7 @@ module.exports = {
   fileExists,
   ensureDirectory,
   symlink,
+  rmdir,
   platform: guessPlatform(),
   unzip,
   untar,
