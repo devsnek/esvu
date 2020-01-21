@@ -18,15 +18,16 @@ function hash(string) {
 }
 
 class EngineInstaller {
-  constructor(status) {
+  constructor(version, status) {
+    this.version = version;
+    this.status = status;
     this.downloadPath = undefined;
     this.extractedPath = undefined;
     this.installPath = path.join(ESVU_PATH, 'engines', this.constructor.config.id);
-    this.status = status;
   }
 
   static async install(version, status) {
-    const installer = new this(status);
+    const installer = new this(version, status);
     if (this.config.externalRequirements) {
       process.stdout.write(`\n! ${this.config.name} has external requirements which may need to be installed separately:\n`);
       this.config.externalRequirements.forEach((e) => {

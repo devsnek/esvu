@@ -22,6 +22,7 @@ selected.
 |--------------------|----------------------------------|------------|-----------|-----------|---------|---------|
 | [Chakra][]         | `ch`, `chakra`                   | ✅         |           | ✅        | ✅      | ✅      |
 | [engine262][]      | `engine262`                      | ✅         | ✅        | ✅        | ✅      | ✅      |
+| [GraalJS][]        | `graaljs`                        | ✅         |           | ✅        |         | ✅      |
 | [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅         | ✅        | ✅        | ✅²     | ✅²     |
 | [QuickJS][]        | `quickjs`, `quickjs-run-test262` |            |           | ✅        |         |         |
 | [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅         | ✅        | ✅        | ✅      | ✅      |
@@ -36,6 +37,7 @@ selected.
 
 [Chakra]: https://github.com/microsoft/chakracore
 [engine262]: https://engine262.js.org
+[GraalJS]: https://github.com/graalvm/graaljs
 [JavaScriptCore]: https://developer.apple.com/documentation/javascriptcore
 [QuickJS]: https://bellard.org/quickjs/
 [SpiderMonkey]: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey
