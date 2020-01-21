@@ -103,6 +103,7 @@ OPTIONS:
     } catch (e) {
       process.stdout.write('\n');
       spinner.fail(e.stack);
+      process.exitCode = 1;
     }
   }
 }());
