@@ -59,6 +59,7 @@ class QuickJSInstaller extends Installer {
 QuickJSInstaller.config = {
   name: 'QuickJS',
   id: 'qjs',
+  supported: ['linux64'],
 };
 
 module.exports = QuickJSInstaller;

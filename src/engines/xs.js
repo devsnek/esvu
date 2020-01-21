@@ -70,6 +70,11 @@ class XSInstaller extends Installer {
 XSInstaller.config = {
   name: 'XS',
   id: 'xs',
+  supported: [
+    'linux32', 'linux64',
+    'win32', 'win64',
+    'darwin64',
+  ],
 };
 
 module.exports = XSInstaller;

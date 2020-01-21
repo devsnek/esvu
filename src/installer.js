@@ -56,6 +56,13 @@ class EngineInstaller {
     status.pass(`Installed version ${version}`);
   }
 
+  static isSupported() {
+    if (this.config.supported) {
+      return this.config.supported.includes(platform);
+    }
+    return true;
+  }
+
   async registerAssets(pattern) {
     const full = path.join(this.extractedLocation, pattern);
     const files = await new Promise((resolve, reject) => {

@@ -85,6 +85,7 @@ class ChakraInstaller extends Installer {
 ChakraInstaller.config = {
   name: 'Chakra',
   id: 'ch',
+  supports: ['linux64', 'darwin64', 'win32', 'win64'],
 };
 
 module.exports = ChakraInstaller;

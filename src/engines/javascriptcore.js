@@ -129,6 +129,11 @@ JavaScriptCoreInstaller.config = {
       url: 'https://github.com/WebKitForWindows/WinCairoRequirements',
     },
   ] : undefined,
+  supported: [
+    'linux32', 'linux64',
+    'win32', 'win64',
+    'darwin64',
+  ],
 };
 
 module.exports = JavaScriptCoreInstaller;

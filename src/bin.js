@@ -26,7 +26,7 @@ async function promptForEngines() {
     choices: Object.keys(engines).map((e) => ({
       name: engines[e].config.name,
       value: e,
-      checked: true,
+      checked: engines[e].isSupported(),
     })),
   });
   return selectedEngines;
@@ -53,7 +53,8 @@ OPTIONS:
     let selectedEngines;
     if (argv.engines) {
       if (argv.engines === 'all') {
-        selectedEngines = Object.keys(engines);
+        selectedEngines = Object.keys(engines)
+          .filter((e) => engines[e].isSupported());
       } else {
         selectedEngines = argv.engines.split(',');
       }

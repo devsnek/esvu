@@ -76,6 +76,11 @@ class V8Installer extends Installer {
 V8Installer.config = {
   name: 'V8',
   id: 'v8',
+  supported: [
+    'linux32', 'linux64',
+    'win32', 'win64',
+    'darwin64',
+  ],
 };
 
 module.exports = V8Installer;

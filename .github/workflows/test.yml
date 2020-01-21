@@ -10,13 +10,22 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        node: [10, 11, 12, 13]
+        node: [10, 12, 13]
     runs-on: ${{ matrix.os }}
     steps:
+      # https://github.com/actions/checkout/issues/135
+      - run: |
+          git config --system core.autocrlf false
+          git config --system core.eol lf
+      # check out repo
       - uses: actions/checkout@v2
+      # install node
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
+      # install deps
       - run: npm install
+      # lint project
       - run: npm run lint
+      # try to install and test all engines
       - run: node src/bin.js --engines=all

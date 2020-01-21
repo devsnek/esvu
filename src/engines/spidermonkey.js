@@ -96,6 +96,11 @@ class SpiderMonkeyInstaller extends Installer {
 SpiderMonkeyInstaller.config = {
   name: 'SpiderMonkey',
   id: 'jsshell',
+  supported: [
+    'linux32', 'linux64',
+    'win32', 'win64',
+    'darwin64',
+  ],
 };
 
 module.exports = SpiderMonkeyInstaller;
