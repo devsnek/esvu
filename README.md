@@ -5,7 +5,7 @@ esvu is your one-stop shop for all implementations of ECMAScript.
 ## Installation
 
 ```
-$ npm i -g esvu
+$ npm i -g devsnek/esvu
 ```
 
 Add `~/.esvu/bin` to your `PATH`.
@@ -23,7 +23,9 @@ selected.
   Install the engine `<engine>`
 - `$ esvu uninstall <engine>`
   Uninstall `<engine>`
-
+- `$ esvu update <engine>`
+  Update `<engine>`. Like `install` but the engine must have been previously
+  installed.
 
 | Engine             | Binary Names¹                    | `darwin64` | `linux32` | `linux64` | `win32` | `win64` |
 |--------------------|----------------------------------|------------|-----------|-----------|---------|---------|

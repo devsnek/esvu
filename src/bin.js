@@ -17,6 +17,7 @@ const packageJson = require('../package.json');
 const { argv } = yargs
   .command('install <engine>', 'Install <engine>')
   .command('uninstall <engine>', 'Uninstall <engine>')
+  .command('update <engine>', 'Update <engine>')
   .option('engines');
 
 process.stdout.write(`esvu v${packageJson.version}\n`);
@@ -31,9 +32,13 @@ async function loadStatus(promptOnEmpty) {
   } catch {
     let selectedEngines = [];
     if (argv.engines) {
-      if (argv.engines === 'all') {
+      if (argv.engines.startsWith('all')) {
         selectedEngines = Object.keys(engines)
           .filter((e) => engines[e].isSupported());
+        const additional = argv.engines.split('+')[1];
+        if (additional) {
+          selectedEngines.push(...additional.split(','));
+        }
       } else {
         selectedEngines = argv.engines.split(',');
       }
@@ -48,6 +53,10 @@ async function loadStatus(promptOnEmpty) {
           checked: engines[e].isSupported(),
         })),
       }));
+    }
+    if (selectedEngines.some((e) => !engines[e])) {
+      process.stderr.write('Invalid engine\n');
+      process.exit(1);
     }
     status = {
       engines: selectedEngines,
@@ -119,8 +128,9 @@ async function installEngine(engine) {
       process.exit(1);
     }
     await Promise.all([
-      status.installed[argv.engine].binEntries.map((b) =>
-        fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
+      status.installed[argv.engine].binEntries
+        && status.installed[argv.engine].binEntries.map((b) =>
+          fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
       rmdir(path.join(ESVU_PATH, 'engines', argv.engine)),
     ]);
     delete status.installed[argv.engine];
@@ -132,6 +142,15 @@ async function installEngine(engine) {
   }
 
   await loadStatus(true);
+
+  if (argv._[0] === 'update') {
+    if (!status.engines.includes(argv.engine)) {
+      process.stderr.write('Engine not valid or not installed\n');
+      process.exit(1);
+    }
+    await installEngine(argv.engine);
+    return;
+  }
 
   if (!status.engines || status.engines.length === 0) {
     process.stderr.write('No engines are configured to be installed\n');
