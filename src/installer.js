@@ -5,6 +5,7 @@
 const fs = require('fs');
 const os = require('os');
 const crypto = require('crypto');
+const stream = require('stream');
 const path = require('path');
 const glob = require('glob');
 const fetch = require('node-fetch');
@@ -28,39 +29,57 @@ class EngineInstaller {
   static async install(version, status) {
     const installer = new this(version);
     if (this.config.externalRequirements) {
-      process.stdout.write(`\n! ${this.config.name} has external requirements which may need to be installed separately:\n`);
+      status.warn('There are external requirements that may need to be installed:');
       this.config.externalRequirements.forEach((e) => {
-        process.stdout.write(`  ${e.name} - ${e.url}\n`);
+        status.warn(`  * ${e.name} - ${e.url}`);
       });
     }
 
-    status.update(`Installing version ${version}`);
+    status.info(`Installing version ${version}`);
 
     const url = await installer.getDownloadURL(version);
-    status.update(`Downloading ${url}`);
+    status.info(`Downloading ${url}`);
     installer.downloadPath = await fetch(url)
       .then(async (r) => {
         const rURL = new URL(r.url);
         const l = path.join(os.tmpdir(), hash(url) + path.extname(rURL.pathname));
         const sink = fs.createWriteStream(l);
+        const progress = status.progress(+r.headers.get('content-length'));
         await new Promise((resolve, reject) => {
-          r.body.pipe(sink)
+          r.body
+            .pipe(new (class extends stream.Transform {
+              constructor(...args) {
+                super(...args);
+                this.count = 0;
+              }
+              _transform(chunk, encoding, cb) {
+                this.count += chunk.length;
+                progress.update(this.count);
+                this.push(chunk);
+                cb(null);
+              }
+              _flush(cb) {
+                cb(null);
+              }
+            })())
+            .pipe(sink)
             .once('error', reject)
             .once('finish', resolve);
         });
+        progress.stop();
         return l;
       });
     installer.extractedPath = `${installer.downloadPath}-extracted`;
 
-    status.update(`Extracting from ${installer.downloadPath}`);
+    status.info(`Extracting ${installer.downloadPath}`);
     await ensureDirectory(installer.installPath);
     await ensureDirectory(path.join(ESVU_PATH, 'bin'));
     await installer.extract();
 
-    status.update(`Installing from ${installer.extractedPath}`);
+    status.info(`Installing ${installer.extractedPath}`);
     await installer.install();
 
-    status.update('Testing engine');
+    status.info('Testing...');
     await installer.test();
 
     await installer.cleanup();

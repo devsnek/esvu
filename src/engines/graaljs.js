@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const assert = require('assert');
 const execa = require('execa');
 const Installer = require('../installer');
-const { platform, untar, unzip } = require('../common');
+const { platform, ensureDirectory, untar, unzip } = require('../common');
 
 function getFilename() {
   switch (platform) {
@@ -39,11 +39,13 @@ class GraalJSInstaller extends Installer {
     return `https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${version}/graalvm-ce-java11-${getFilename()}-${version}.tar.gz`;
   }
 
-  extract() {
+  async extract() {
     if (platform.startsWith('win')) {
-      return unzip(this.downloadPath, this.extractedPath);
+      await unzip(this.downloadPath, this.extractedPath);
+    } else {
+      await ensureDirectory(this.extractedPath);
+      await untar(this.downloadPath, this.extractedPath);
     }
-    return untar(this.downloadPath, this.extractedPath);
   }
 
   async install() {

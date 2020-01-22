@@ -4,6 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "dependencies": {
+    "chalk": "^3.0.0",
+    "cli-progress": "^3.5.0",
     "execa": "^4.0.0",
     "extract-zip": "^1.6.7",
     "glob": "^7.1.6",

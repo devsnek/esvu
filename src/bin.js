@@ -7,11 +7,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const ora = require('ora');
 const inquirer = require('inquirer');
 const yargs = require('yargs');
 const { engines } = require('.');
 const { ESVU_PATH, rmdir } = require('./common');
+const Logger = require('./logger');
 const packageJson = require('../package.json');
 
 const { argv } = yargs
@@ -78,34 +78,22 @@ async function installEngine(engine) {
     };
   }
 
-  const spinner = ora({ prefixText: Installer.config.name });
-  spinner.start();
+  const logger = new Logger(Installer.config.name);
+  logger.info('Checking version...');
 
   const version = await Installer.resolveVersion('latest');
   if (status.installed[engine].version === version) {
-    spinner.succeed(`version ${version}`);
+    logger.succeed(`Version ${version} installed`);
     return;
   }
 
   try {
-    let first = true;
-    const binEntries = await Installer.install(version, {
-      update(t) {
-        if (first) {
-          first = false;
-        } else {
-          process.stdout.write('\n');
-        }
-        spinner.text = t;
-        spinner.render();
-      },
-    });
+    const binEntries = await Installer.install(version, logger);
     status.installed[engine].version = version;
     status.installed[engine].binEntries = binEntries;
-    spinner.succeed(`Installed version ${version} with bin entries: ${binEntries.join(', ')}`);
+    logger.succeed(`Version ${version} installed with bin entries: ${binEntries.join(', ')}`);
   } catch (e) {
-    process.stdout.write('\n');
-    spinner.fail(e.stack);
+    logger.fatal(e);
     process.exitCode = 1;
   }
 }
