@@ -64,11 +64,14 @@ class SpiderMonkeyInstaller extends Installer {
         this.binPath = await this.registerBinary('js', 'spidermonkey');
         break;
       case 'linux32':
-      case 'linux64':
+      case 'linux64': {
         await this.registerAssets('*.so');
-        this.binPath = await this.registerBinary('js', 'spidermonkey');
-        await this.registerScript('sm', `LD_LIBRARY_PATH="${this.installPath}" "${this.binPath}"`);
+        const sm = await this.registerAsset('js');
+        const source = `LD_LIBRARY_PATH="${this.installPath}" "${sm}"`;
+        this.binPath = await this.registerScript('spidermonkey', source);
+        await this.registerScript('sm', source);
         break;
+      }
       case 'win32':
       case 'win64': {
         await this.registerAssets('*.dll');

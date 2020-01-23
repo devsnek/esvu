@@ -63,6 +63,9 @@ async function loadStatus(promptIfEmpty) {
       }));
     }
 
+    // eslint-disable-next-line no-use-before-define
+    selectedEngines = selectedEngines.map((e) => getInstaller(e, false).config.id);
+
     status = {
       selectedEngines,
       installed: {},
@@ -150,4 +153,7 @@ async function updateAll() {
       await updateAll();
       break;
   }
-}());
+}()).catch((e) => {
+  logger.fatal(e);
+  process.exit(1);
+});
