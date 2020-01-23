@@ -38,7 +38,7 @@ async function loadStatus(promptIfEmpty) {
     if (argv.engines) {
       if (argv.engines.startsWith('all')) {
         selectedEngines = Object.keys(esvu.engines)
-          .filter((e) => esvu.engines[e].isSupported());
+          .filter((e) => esvu.engines[e].shouldInstallByDefault());
         const additional = argv.engines.split('+')[1];
         if (additional) {
           selectedEngines.push(...additional.split(','));
@@ -118,7 +118,12 @@ async function updateAll() {
   }
 
   for (const engine of status.selectedEngines) {
-    await updateEngine(engine); // eslint-disable-line no-await-in-loop
+    try {
+      await updateEngine(engine); // eslint-disable-line no-await-in-loop
+    } catch (e) {
+      logger.fatal(`Fatal error installing ${getInstaller(engine).config.name}`, e);
+      process.exitCode = 1;
+    }
   }
 }
 
