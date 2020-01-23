@@ -3,6 +3,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const yargs = require('yargs');
 const inquirer = require('inquirer');
 const Logger = require('./logger');
@@ -69,6 +70,11 @@ async function loadStatus(promptIfEmpty) {
   }
 
   const onExit = () => {
+    try {
+      fs.mkdirSync(path.dirname(STATUS_PATH));
+    } catch {
+      // nothing
+    }
     fs.writeFileSync(STATUS_PATH, JSON.stringify(status, null, 2));
     process.exit();
   };
@@ -99,12 +105,14 @@ async function installEngine(name) {
 
 async function updateEngine(name) {
   await loadStatus(false);
+
   const Installer = getInstaller(name, true);
   await Installer.install('latest', status);
 }
 
 async function uninstallEngine(name) {
   await loadStatus(false);
+
   const Installer = getInstaller(name, true);
   await Installer.uninstall(status);
 }
@@ -119,7 +127,7 @@ async function updateAll() {
 
   for (const engine of status.selectedEngines) {
     try {
-      await updateEngine(engine); // eslint-disable-line no-await-in-loop
+      await installEngine(engine); // eslint-disable-line no-await-in-loop
     } catch (e) {
       logger.fatal(`Fatal error installing ${getInstaller(engine).config.name}`, e);
       process.exitCode = 1;
