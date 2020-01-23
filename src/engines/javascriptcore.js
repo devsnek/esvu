@@ -28,6 +28,14 @@ class JavaScriptCoreInstaller extends Installer {
     this.binPath = undefined;
   }
 
+  static shouldInstallByDefault() {
+    // jsc has additional deps on windows that might not be present.
+    if (platform.startsWith('win')) {
+      return false;
+    }
+    return this.isSupported();
+  }
+
   static async resolveVersion(version) {
     if (version === 'latest') {
       switch (platform) {
@@ -146,9 +154,8 @@ JavaScriptCoreInstaller.config = {
   ] : undefined,
   supported: [
     'linux32', 'linux64',
+    'win32', 'win64',
     'darwin64',
-    // external requirements, don't install by default
-    // 'win32', 'win64',
   ],
 };
 

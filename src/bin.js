@@ -2,16 +2,12 @@
 
 'use strict';
 
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-continue */
-
 const fs = require('fs');
-const path = require('path');
-const inquirer = require('inquirer');
 const yargs = require('yargs');
-const { engines } = require('.');
-const { ESVU_PATH, rmdir } = require('./common');
+const inquirer = require('inquirer');
 const Logger = require('./logger');
+const { STATUS_PATH } = require('./common');
+const esvu = require('.');
 const packageJson = require('../package.json');
 
 const { argv } = yargs
@@ -20,21 +16,29 @@ const { argv } = yargs
   .command('update <engine>', 'Update <engine>')
   .option('engines');
 
-process.stdout.write(`esvu v${packageJson.version}\n`);
+const logger = new Logger('esvu');
 
-const STATUS_PATH = path.join(ESVU_PATH, 'status.json');
+logger.info(`version ${packageJson.version}`);
 
 let status;
-async function loadStatus(promptOnEmpty) {
+async function loadStatus(promptIfEmpty) {
+  if (status) {
+    return;
+  }
+
   try {
     const source = await fs.promises.readFile(STATUS_PATH, 'utf8');
     status = JSON.parse(source);
   } catch {
     let selectedEngines = [];
+
+    // --engines=name1,...
+    // --engines=all
+    // --engines=all+name1,...
     if (argv.engines) {
       if (argv.engines.startsWith('all')) {
-        selectedEngines = Object.keys(engines)
-          .filter((e) => engines[e].isSupported());
+        selectedEngines = Object.keys(esvu.engines)
+          .filter((e) => esvu.engines[e].isSupported());
         const additional = argv.engines.split('+')[1];
         if (additional) {
           selectedEngines.push(...additional.split(','));
@@ -42,30 +46,26 @@ async function loadStatus(promptOnEmpty) {
       } else {
         selectedEngines = argv.engines.split(',');
       }
-    } else if (promptOnEmpty) {
+    } else if (promptIfEmpty) {
       ({ selectedEngines } = await inquirer.prompt({
         name: 'selectedEngines',
         type: 'checkbox',
-        message: 'Which engines would you like to install?',
-        choices: Object.keys(engines).map((e) => ({
-          name: engines[e].config.name,
-          value: e,
-          checked: engines[e].isSupported(),
-        })),
+        message: 'Select engines to install',
+        choices: Object.keys(esvu.engines).map((e) => {
+          const engine = esvu.engines[e];
+          return {
+            name: engine.config.name,
+            value: engine.config.id,
+            checked: engine.shouldInstallByDefault(),
+          };
+        }),
       }));
     }
-    if (selectedEngines.some((e) => !engines[e])) {
-      process.stderr.write('Invalid engine\n');
-      process.exit(1);
-    }
+
     status = {
-      engines: selectedEngines,
+      selectedEngines,
       installed: {},
     };
-  }
-
-  if (!status.installed) {
-    status.installed = {};
   }
 
   const onExit = () => {
@@ -77,89 +77,64 @@ async function loadStatus(promptOnEmpty) {
     .on('SIGINT', onExit);
 }
 
-async function installEngine(engine) {
-  const Installer = engines[engine];
+function getInstaller(name, verifyInstalled) {
+  const Installer = esvu.getInstaller(name);
+  if (!Installer) {
+    logger.fatal(`Unknown engine: ${name}`);
+    process.exit(1);
+  }
+  if (verifyInstalled && !status.selectedEngines.includes(Installer.config.id)) {
+    logger.fatal(`${Installer.config.name} is not installed`);
+    process.exit(1);
+  }
+  return Installer;
+}
 
-  if (!status.installed[engine]) {
-    status.installed[engine] = {
-      version: undefined,
-      binEntries: undefined,
-    };
+async function installEngine(name) {
+  await loadStatus(false);
+
+  const Installer = getInstaller(name, false);
+  await Installer.install('latest', status);
+}
+
+async function updateEngine(name) {
+  await loadStatus(false);
+  const Installer = getInstaller(name, true);
+  await Installer.install('latest', status);
+}
+
+async function uninstallEngine(name) {
+  await loadStatus(false);
+  const Installer = getInstaller(name, true);
+  await Installer.uninstall(status);
+}
+
+async function updateAll() {
+  await loadStatus(true);
+
+  if (status.selectedEngines.length === 0) {
+    logger.fatal('No engines are selected to install');
+    process.exit(1);
   }
 
-  const logger = new Logger(Installer.config.name);
-  logger.info('Checking version...');
-
-  const version = await Installer.resolveVersion('latest');
-  if (status.installed[engine].version === version) {
-    logger.succeed(`Version ${version} installed`);
-    return;
-  }
-
-  try {
-    const binEntries = await Installer.install(version, logger);
-    status.installed[engine].version = version;
-    status.installed[engine].binEntries = binEntries;
-    logger.succeed(`Version ${version} installed with bin entries: ${binEntries.join(', ')}`);
-  } catch (e) {
-    logger.fatal(e);
-    process.exitCode = 1;
+  for (const engine of status.selectedEngines) {
+    await updateEngine(engine); // eslint-disable-line no-await-in-loop
   }
 }
 
 (async function main() {
-  if (argv._[0] === 'install') {
-    if (!engines[argv.engine]) {
-      process.stderr.write('Engine not recognized\n');
-      process.exit(1);
-    }
-    await loadStatus(false);
-    if (!status.engines.includes(argv.engine)) {
-      status.engines.push(argv.engine);
-    }
-    await installEngine(argv.engine);
-    return;
-  }
-
-  if (argv._[0] === 'uninstall') {
-    await loadStatus(false);
-    if (!status.installed[argv.engine]) {
-      process.stderr.write('Engine not recognized\n');
-      process.exit(1);
-    }
-    await Promise.all([
-      status.installed[argv.engine].binEntries
-        && status.installed[argv.engine].binEntries.map((b) =>
-          fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
-      rmdir(path.join(ESVU_PATH, 'engines', argv.engine)),
-    ]);
-    delete status.installed[argv.engine];
-    const set = new Set(status.engines);
-    set.delete(argv.engine);
-    status.engines = [...set];
-    process.stdout.write(`Removed ${argv.engine}`);
-    return;
-  }
-
-  await loadStatus(true);
-
-  if (argv._[0] === 'update') {
-    if (!status.engines.includes(argv.engine)) {
-      process.stderr.write('Engine not valid or not installed\n');
-      process.exit(1);
-    }
-    await installEngine(argv.engine);
-    return;
-  }
-
-  if (!status.engines || status.engines.length === 0) {
-    process.stderr.write('No engines are configured to be installed\n');
-    process.exit(1);
-  }
-
-  process.stdout.write(`Installing ${status.engines.map((e) => engines[e].config.name).join(', ')}\n`);
-
-  for (const engine of status.engines) {
-    await installEngine(engine);
+  switch (argv._[0]) {
+    case 'install':
+      await installEngine(argv.engine);
+      break;
+    case 'update':
+      await updateEngine(argv.engine);
+      break;
+    case 'uninstall':
+      await uninstallEngine(argv.engine);
+      break;
+    default:
+      await updateAll();
+      break;
   }
 }());

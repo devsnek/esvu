@@ -10,6 +10,7 @@ const path = require('path');
 const glob = require('glob');
 const fetch = require('node-fetch');
 const { ESVU_PATH, ensureDirectory, symlink, platform, rmdir } = require('./common');
+const Logger = require('./logger');
 
 function hash(string) {
   const h = crypto.createHash('md5');
@@ -26,25 +27,41 @@ class EngineInstaller {
     this.binEntries = [];
   }
 
-  static async install(version, status) {
+  static async install(requestedVersion, status) {
+    const logger = new Logger(this.config.name);
+
+    if (!status.selectedEngines.includes(this.config.id)) {
+      status.selectedEngines.push(this.config.id);
+    }
+
+    logger.info('Checking version...');
+
+    const version = await this.resolveVersion(requestedVersion);
+    if (status.installed[this.config.id]
+        && version === status.installed[this.config.id].version) {
+      logger.succeed('Up to date');
+      return;
+    }
+
     const installer = new this(version);
+
     if (this.config.externalRequirements) {
-      status.warn('There are external requirements that may need to be installed:');
+      logger.warn('There are external requirements that may need to be installed:');
       this.config.externalRequirements.forEach((e) => {
-        status.warn(`  * ${e.name} - ${e.url}`);
+        logger.warn(`  * ${e.name} - ${e.url}`);
       });
     }
 
-    status.info(`Installing version ${version}`);
+    logger.info(`Installing version ${version}`);
 
     const url = await installer.getDownloadURL(version);
-    status.info(`Downloading ${url}`);
+    logger.info(`Downloading ${url}`);
     installer.downloadPath = await fetch(url)
       .then(async (r) => {
         const rURL = new URL(r.url);
         const l = path.join(os.tmpdir(), hash(url) + path.extname(rURL.pathname));
         const sink = fs.createWriteStream(l);
-        const progress = status.progress(+r.headers.get('content-length'));
+        const progress = logger.progress(+r.headers.get('content-length'));
         await new Promise((resolve, reject) => {
           r.body
             .pipe(new (class extends stream.Transform {
@@ -71,20 +88,45 @@ class EngineInstaller {
       });
     installer.extractedPath = `${installer.downloadPath}-extracted`;
 
-    status.info(`Extracting ${installer.downloadPath}`);
+    logger.info(`Extracting ${installer.downloadPath}`);
     await ensureDirectory(installer.installPath);
     await ensureDirectory(path.join(ESVU_PATH, 'bin'));
     await installer.extract();
 
-    status.info(`Installing ${installer.extractedPath}`);
+    logger.info(`Installing ${installer.extractedPath}`);
     await installer.install();
 
-    status.info('Testing...');
+    logger.info('Testing...');
     await installer.test();
 
     await installer.cleanup();
 
-    return installer.binEntries;
+    status.installed[this.config.id] = {
+      version,
+      binEntries: installer.binEntries,
+    };
+
+    logger.succeed(`Installed with bin entries: ${installer.binEntries.join(', ')}`);
+  }
+
+  static async uninstall(status) {
+    const logger = new Logger(this.config.name);
+    logger.info('Uninstalling...');
+
+    // Delete bin entries and engine assets
+    await Promise.all([
+      status.installed[this.config.id].binEntries
+        && status.installed[this.config.id].binEntries.map((b) =>
+          fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
+      rmdir(path.join(ESVU_PATH, 'engines', this.config.id)),
+    ]);
+
+    // Remove from status.selectedEngines
+    status.selectedEngines.splice(status.selectedEngines.indexOf(this.config.id), 1);
+
+    delete status.installed[this.config.id];
+
+    logger.succeed('Removed assets and bin entries');
   }
 
   static isSupported() {
@@ -92,6 +134,10 @@ class EngineInstaller {
       return this.config.supported.includes(platform);
     }
     return true;
+  }
+
+  static shouldInstallByDefault() {
+    return this.isSupported();
   }
 
   cleanup() {

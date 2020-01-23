@@ -26,6 +26,11 @@ class GraalJSInstaller extends Installer {
     this.binPath = undefined;
   }
 
+  static shouldInstallByDefault() {
+    // Graal VM archives are >400mb, so don't download by default.
+    return false;
+  }
+
   static async resolveVersion(version) {
     if (version === 'latest') {
       const body = await fetch('https://api.github.com/repos/graalvm/graalvm-ce-builds/releases')
@@ -68,10 +73,7 @@ GraalJSInstaller.config = {
   name: 'GraalJS',
   id: 'graaljs',
   supported: [
-    // graal vm archives are >400mb, so don't enable by default.
-    // 'linux32', 'linux64',
-    // 'win32', 'win64',
-    // 'darwin64',
+    'linux64', 'win64', 'darwin64',
   ],
 };
 

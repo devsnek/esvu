@@ -8,6 +8,7 @@ const tar = require('tar');
 const rimraf = require('rimraf');
 
 const ESVU_PATH = path.join(os.homedir(), '.esvu');
+const STATUS_PATH = path.join(ESVU_PATH, 'status.json');
 
 async function fileExists(file) {
   try {
@@ -69,6 +70,7 @@ function untar(from, to) {
 
 module.exports = {
   ESVU_PATH,
+  STATUS_PATH,
   fileExists,
   ensureDirectory,
   symlink,
