@@ -115,9 +115,11 @@ class EngineInstaller {
 
     // Delete bin entries and engine assets
     await Promise.all([
-      status.installed[this.config.id].binEntries
-        && status.installed[this.config.id].binEntries.map((b) =>
-          fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
+      status.installed[this.config.id]
+      && status.installed[this.config.id].binEntries
+      && status.installed[this.config.id].binEntries.map((b) =>
+        fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
+
       rmdir(path.join(ESVU_PATH, 'engines', this.config.id)),
     ]);
 

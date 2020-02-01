@@ -33,7 +33,7 @@ class JavaScriptCoreInstaller extends Installer {
     if (platform.startsWith('win')) {
       return false;
     }
-    return this.isSupported();
+    return super.shouldInstallByDefault();
   }
 
   static async resolveVersion(version) {
