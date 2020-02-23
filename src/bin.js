@@ -15,7 +15,8 @@ const { argv } = yargs
   .command('install <engine>', 'Install <engine>')
   .command('uninstall <engine>', 'Uninstall <engine>')
   .command('update <engine>', 'Update <engine>')
-  .option('engines');
+  .option('engines')
+  .strict();
 
 const logger = new Logger('esvu');
 
