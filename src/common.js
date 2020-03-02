@@ -64,7 +64,8 @@ function unzip(from, to) {
   });
 }
 
-function untar(from, to) {
+async function untar(from, to) {
+  await ensureDirectory(to);
   return tar.extract({ file: from, cwd: to });
 }
 

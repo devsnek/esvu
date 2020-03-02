@@ -7,7 +7,7 @@ const path = require('path');
 const fetch = require('node-fetch');
 const execa = require('execa');
 const Installer = require('../installer');
-const { platform, ensureDirectory, unzip, untar } = require('../common');
+const { platform, unzip, untar } = require('../common');
 
 function getFilename() {
   switch (platform) {
@@ -47,7 +47,6 @@ class ChakraInstaller extends Installer {
     if (platform.startsWith('win')) {
       await unzip(this.downloadPath, this.extractedPath);
     } else {
-      await ensureDirectory(this.extractedPath);
       await untar(this.downloadPath, this.extractedPath);
     }
   }
@@ -72,8 +71,7 @@ class ChakraInstaller extends Installer {
     const output = '42';
 
     const file = path.join(os.tmpdir(), 'esvu_chakra_test.js');
-
-    fs.writeFileSync(file, program);
+    await fs.promises.writeFile(file, program);
 
     assert.strictEqual(
       (await execa(this.binPath, [file])).stdout,

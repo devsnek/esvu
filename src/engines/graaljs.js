@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const assert = require('assert');
 const execa = require('execa');
 const Installer = require('../installer');
-const { platform, ensureDirectory, untar, unzip } = require('../common');
+const { platform, untar, unzip } = require('../common');
 
 function getFilename() {
   switch (platform) {
@@ -48,7 +48,6 @@ class GraalJSInstaller extends Installer {
     if (platform.startsWith('win')) {
       await unzip(this.downloadPath, this.extractedPath);
     } else {
-      await ensureDirectory(this.extractedPath);
       await untar(this.downloadPath, this.extractedPath);
     }
   }
