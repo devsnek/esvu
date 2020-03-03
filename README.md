@@ -5,11 +5,10 @@ esvu is your one-stop shop for all implementations of ECMAScript.
 ## Installation
 
 ```
-$ npm i -g devsnek/esvu
+$ npm i -g esvu
 ```
 
 Add `~/.esvu/bin` to your `PATH`.
-
 
 ## Usage
 
@@ -27,23 +26,20 @@ selected.
   Update `<engine>`. Like `install` but the engine must have been previously
   installed.
 
-| Engine             | Binary Names¹                    | `darwin64` | `linux32` | `linux64` | `win32` | `win64` |
+| Engine             | Binary Names                     | `darwin64` | `linux32` | `linux64` | `win32` | `win64` |
 |--------------------|----------------------------------|------------|-----------|-----------|---------|---------|
 | [Chakra][]         | `ch`, `chakra`                   | ✅         |           | ✅        | ✅      | ✅      |
 | [engine262][]      | `engine262`                      | ✅         | ✅        | ✅        | ✅      | ✅      |
 | [GraalJS][]        | `graaljs`                        | ✅         |           | ✅        |         | ✅      |
 | [Hermes][]         | `hermes`, `hermes-repl`          | ✅         |           | ✅        |         | ✅      |
-| [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅         | ✅        | ✅        | ✅²     | ✅²     |
+| [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅         | ✅        | ✅        | ✅      | ✅      |
 | [QuickJS][]        | `quickjs`, `quickjs-run-test262` |            |           | ✅        |         |         |
 | [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅         | ✅        | ✅        | ✅      | ✅      |
 | [V8][]             | `v8`                             | ✅         | ✅        | ✅        | ✅      | ✅      |
-| [XS][]             | `xs`                             | ✅³        | ✅        | ✅        | ✅      | ✅³     |
+| [XS][]             | `xs`                             | ✅         | ✅        | ✅        | ✅      | ✅      |
 
-¹ These may be installed as symlinks, shell scripts, or batch files
-
-² JavaScriptCore has additional runtime requirements
-
-³ These binaries are natively 32-bit
+Some binaries may be exposed as batch/shell scripts to properly handling shared library loading. Some binaries on
+64-bit systems may be natively 32-bit.
 
 [Chakra]: https://github.com/microsoft/chakracore
 [engine262]: https://engine262.js.org
