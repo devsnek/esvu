@@ -26,6 +26,9 @@ selected.
   Update `<engine>`. Like `install` but the engine must have been previously
   installed.
 
+If you're using [eshost-cli][], you can run `eshost --configure-esvu` after
+installing engines to make eshost automatically find the installed engines.
+
 | Engine             | Binary Names                     | `darwin64` | `linux32` | `linux64` | `win32` | `win64` |
 |--------------------|----------------------------------|------------|-----------|-----------|---------|---------|
 | [Chakra][]         | `ch`, `chakra`                   | ✅         |           | ✅        | ✅      | ✅      |
@@ -41,6 +44,7 @@ selected.
 Some binaries may be exposed as batch/shell scripts to properly handling shared library loading. Some binaries on
 64-bit systems may be natively 32-bit.
 
+[eshost-cli]: https://github.com/bterlson/eshost-cli
 [Chakra]: https://github.com/microsoft/chakracore
 [engine262]: https://engine262.js.org
 [GraalJS]: https://github.com/graalvm/graaljs
