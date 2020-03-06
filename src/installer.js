@@ -19,31 +19,36 @@ function hash(string) {
 }
 
 class EngineInstaller {
-  constructor(version) {
+  constructor(version, isLatest) {
     this.version = version;
+    this.isLatest = isLatest;
     this.downloadPath = undefined;
     this.extractedPath = undefined;
     this.installPath = path.join(ESVU_PATH, 'engines', this.constructor.config.id);
+    if (!isLatest) {
+      this.installPath += `-${version}`;
+    }
     this.binEntries = [];
   }
 
   static async install(requestedVersion, status) {
     const logger = new Logger(this.config.name);
 
-    if (!status.selectedEngines.includes(this.config.id)) {
+    if (requestedVersion === 'latest' && !status.selectedEngines.includes(this.config.id)) {
       status.selectedEngines.push(this.config.id);
     }
 
     logger.info('Checking version...');
 
     const version = await this.resolveVersion(requestedVersion);
-    if (status.installed[this.config.id]
-        && version === status.installed[this.config.id].version) {
+    const INSTALLED_ID = requestedVersion === 'latest' ? this.config.id : `${this.config.id}-${version}`;
+    if (status.installed[INSTALLED_ID]
+        && version === status.installed[INSTALLED_ID].version) {
       logger.succeed('Up to date');
       return;
     }
 
-    const installer = new this(version);
+    const installer = new this(version, requestedVersion === 'latest');
 
     if (this.config.externalRequirements) {
       logger.warn('There are external requirements that may need to be installed:');
@@ -58,6 +63,9 @@ class EngineInstaller {
     logger.info(`Downloading ${url}`);
     installer.downloadPath = await fetch(url)
       .then(async (r) => {
+        if (!r.ok) {
+          throw new Error(`Got ${r.status}`);
+        }
         const rURL = new URL(r.url);
         const l = path.join(os.tmpdir(), hash(url) + path.extname(rURL.pathname));
         const sink = fs.createWriteStream(l);
@@ -101,7 +109,7 @@ class EngineInstaller {
 
     await installer.cleanup();
 
-    status.installed[this.config.id] = {
+    status.installed[INSTALLED_ID] = {
       version,
       binEntries: installer.binEntries,
     };
@@ -109,24 +117,32 @@ class EngineInstaller {
     logger.succeed(`Installed with bin entries: ${installer.binEntries.join(', ')}`);
   }
 
-  static async uninstall(status) {
+  static async uninstall(version, status) {
     const logger = new Logger(this.config.name);
     logger.info('Uninstalling...');
 
+    if (version !== 'latest') {
+      version = await this.resolveVersion(version);
+    }
+
+    const INSTALLED_ID = version === 'latest' ? this.config.id : `${this.config.id}-${version}`;
+
     // Delete bin entries and engine assets
     await Promise.all([
-      status.installed[this.config.id]
-      && status.installed[this.config.id].binEntries
-      && status.installed[this.config.id].binEntries.map((b) =>
+      status.installed[INSTALLED_ID]
+      && status.installed[INSTALLED_ID].binEntries
+      && status.installed[INSTALLED_ID].binEntries.map((b) =>
         fs.promises.unlink(path.join(ESVU_PATH, 'bin', b))),
 
-      rmdir(path.join(ESVU_PATH, 'engines', this.config.id)),
+      rmdir(path.join(ESVU_PATH, 'engines', INSTALLED_ID)),
     ]);
 
     // Remove from status.selectedEngines
-    status.selectedEngines.splice(status.selectedEngines.indexOf(this.config.id), 1);
+    if (version === 'latest') {
+      status.selectedEngines.splice(status.selectedEngines.indexOf(this.config.id), 1);
+    }
 
-    delete status.installed[this.config.id];
+    delete status.installed[INSTALLED_ID];
 
     logger.succeed('Removed assets and bin entries');
   }
@@ -178,6 +194,9 @@ class EngineInstaller {
   }
 
   async registerBinarySymlink(from, name) {
+    if (!this.isLatest) {
+      name += `-${this.version}`;
+    }
     const bin = path.join(ESVU_PATH, 'bin', name);
     await symlink(from, bin);
     this.binEntries.push(name);
@@ -185,6 +204,9 @@ class EngineInstaller {
   }
 
   async registerScript(name, body) {
+    if (!this.isLatest) {
+      name += `-${this.version}`;
+    }
     let source;
     if (platform.startsWith('win')) {
       name += '.cmd';

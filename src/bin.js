@@ -100,11 +100,17 @@ function getInstaller(name, verifyInstalled) {
   return Installer;
 }
 
-async function installEngine(name) {
+function parseEngine(s) {
+  const [name, version] = s.split('@');
+  return [name, version || 'latest'];
+}
+
+async function installEngine(engine) {
   await loadStatus(false);
 
+  const [name, version] = parseEngine(engine);
   const Installer = getInstaller(name, false);
-  await Installer.install('latest', status);
+  await Installer.install(version, status);
 }
 
 async function updateEngine(name) {
@@ -114,11 +120,12 @@ async function updateEngine(name) {
   await Installer.install('latest', status);
 }
 
-async function uninstallEngine(name) {
+async function uninstallEngine(engine) {
   await loadStatus(false);
 
-  const Installer = getInstaller(name, true);
-  await Installer.uninstall(status);
+  const [name, version] = parseEngine(engine);
+  const Installer = getInstaller(name, false);
+  await Installer.uninstall(version, status);
 }
 
 async function updateAll() {
