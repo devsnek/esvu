@@ -5,22 +5,22 @@
   "main": "src/index.js",
   "dependencies": {
     "chalk": "^3.0.0",
-    "cli-progress": "^3.5.0",
+    "cli-progress": "^3.6.0",
     "execa": "^4.0.0",
     "extract-zip": "^1.6.7",
     "glob": "^7.1.6",
-    "inquirer": "^7.0.3",
+    "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
     "ora": "^4.0.3",
-    "rimraf": "^3.0.0",
+    "rimraf": "^3.0.2",
     "tar": "^5.0.5",
-    "yargs": "^15.1.0"
+    "yargs": "^15.3.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
-    "eslint": "^6.1.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.20.0"
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1"
   },
   "bin": {
     "esvu": "./src/bin.js"
