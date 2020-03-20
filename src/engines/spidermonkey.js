@@ -32,23 +32,42 @@ class SpiderMonkeyInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const data = await fetch('https://product-details.mozilla.org/1.0/firefox_history_development_releases.json')
-        .then((r) => r.json());
-      let latestVersion = 0;
-      let latestTimestamp = 0;
-      for (const [key, value] of Object.entries(data)) {
-        const timestamp = +new Date(value);
-        if (latestTimestamp < timestamp) {
-          latestTimestamp = timestamp;
-          latestVersion = key;
-        }
-      }
-      return latestVersion;
+      // Build a request for buildhub2: https://buildhub2.readthedocs.io/en/latest/project.html
+      const body = {
+        size: 1,
+        sort: { 'build.id': 'desc' },
+        query: {
+          bool: {
+            must: [
+              { term: { 'source.product': 'firefox' } },
+              { term: { 'source.tree': 'mozilla-central' } },
+              { term: { 'target.channel': 'nightly' } },
+              { term: { 'target.platform': getFilename() } },
+            ],
+          },
+        },
+      };
+
+      const data = await fetch('https://buildhub.moz.tools/api/search', {
+        method: 'post',
+        body: JSON.stringify(body),
+      }).then((r) => r.json());
+
+      const source = data.hits.hits[0]._source;
+
+      return `${source.target.version}#${source.build.id}`;
     }
     return version;
   }
 
   getDownloadURL(version) {
+    const match = /#(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/.exec(version);
+    if (match) {
+      const year = match[1];
+      const month = match[2];
+      const date = match.slice(1).join('-');
+      return `https://archive.mozilla.org/pub/firefox/nightly/${year}/${month}/${date}-mozilla-central/jsshell-${getFilename()}.zip`;
+    }
     return `https://archive.mozilla.org/pub/firefox/releases/${version}/jsshell/jsshell-${getFilename()}.zip`;
   }
 
