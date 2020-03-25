@@ -1,20 +1,20 @@
 {
   "name": "esvu",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
   "main": "src/index.js",
   "dependencies": {
     "chalk": "^3.0.0",
     "cli-progress": "^3.6.0",
     "execa": "^4.0.0",
-    "extract-zip": "^1.6.7",
+    "extract-zip": "^1.7.0",
     "glob": "^7.1.6",
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
     "ora": "^4.0.3",
     "rimraf": "^3.0.2",
     "tar": "^5.0.5",
-    "yargs": "^15.3.0"
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
