@@ -61,8 +61,12 @@ class SpiderMonkeyInstaller extends Installer {
   }
 
   getDownloadURL(version) {
-    if (this.isLatest) {
-      return `https://archive.mozilla.org/pub/firefox/nightly/latest-mozilla-central/jsshell-${getFilename()}.zip`;
+    const match = /@(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/.exec(version);
+    if (match) {
+      const year = match[1];
+      const month = match[2];
+      const date = match.slice(1).join('-');
+      return `https://archive.mozilla.org/pub/firefox/nightly/${year}/${month}/${date}-mozilla-central/jsshell-${getFilename()}.zip`
     }
     return `https://archive.mozilla.org/pub/firefox/releases/${version}/jsshell/jsshell-${getFilename()}.zip`;
   }
