@@ -55,13 +55,13 @@ class SpiderMonkeyInstaller extends Installer {
 
       const source = data.hits.hits[0]._source;
 
-      return `${source.target.version}@${source.build.id}`;
+      return `${source.target.version}#${source.build.id}`;
     }
     return version;
   }
 
   getDownloadURL(version) {
-    const match = /@(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/.exec(version);
+    const match = /#(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/.exec(version);
     if (match) {
       const year = match[1];
       const month = match[2];
