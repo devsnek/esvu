@@ -31,6 +31,9 @@ async function loadStatus(promptIfEmpty) {
   try {
     const source = await fs.promises.readFile(STATUS_PATH, 'utf8');
     status = JSON.parse(source);
+    if (!status.installed) {
+      status.installed = {};
+    }
   } catch {
     let selectedEngines = [];
 

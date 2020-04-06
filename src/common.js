@@ -53,15 +53,7 @@ function guessPlatform() {
 }
 
 function unzip(from, to) {
-  return new Promise((resolve, reject) => {
-    extractZip(from, { dir: to }, (e) => {
-      if (e) {
-        reject(e);
-      } else {
-        resolve();
-      }
-    });
-  });
+  return extractZip(from, { dir: to });
 }
 
 async function untar(from, to) {
