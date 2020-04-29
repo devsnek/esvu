@@ -5,13 +5,13 @@
   "main": "src/index.js",
   "dependencies": {
     "chalk": "^3.0.0",
-    "cli-progress": "^3.6.1",
+    "cli-progress": "^3.8.0",
     "execa": "^4.0.0",
     "extract-zip": "^2.0.0",
     "glob": "^7.1.6",
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
-    "ora": "^4.0.3",
+    "ora": "^4.0.4",
     "rimraf": "^3.0.2",
     "tar": "^5.0.5",
     "yargs": "^15.3.1"

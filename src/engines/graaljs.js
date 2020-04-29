@@ -35,7 +35,7 @@ class GraalJSInstaller extends Installer {
     if (version === 'latest') {
       const body = await fetch('https://api.github.com/repos/graalvm/graalvm-ce-builds/releases')
         .then((r) => r.json());
-      return body[0].tag_name.slice(3);
+      return body.find((b) => !b.prerelease).tag_name.slice(3);
     }
     return version;
   }

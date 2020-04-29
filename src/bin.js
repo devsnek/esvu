@@ -82,6 +82,10 @@ async function loadStatus(promptIfEmpty) {
     } catch {
       // nothing
     }
+    if (status.selectedEngines.length > Object.keys(status.installed).length) {
+      logger.fatal('Some engines were not installed. This is a bug, please report it.');
+      process.exitCode = 1;
+    }
     fs.writeFileSync(STATUS_PATH, JSON.stringify(status, null, 2));
     process.exit();
   };
