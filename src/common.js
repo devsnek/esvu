@@ -52,13 +52,15 @@ function guessPlatform() {
   return `${platform}${arch}`;
 }
 
-function unzip(from, to) {
-  return extractZip(from, { dir: to });
+async function unzip(from, to) {
+  await rmdir(to);
+  await extractZip(from, { dir: to });
 }
 
 async function untar(from, to) {
+  await rmdir(to);
   await ensureDirectory(to);
-  return tar.extract({ file: from, cwd: to });
+  await tar.extract({ file: from, cwd: to });
 }
 
 module.exports = {
