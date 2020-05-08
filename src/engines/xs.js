@@ -31,10 +31,9 @@ class XSInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const body = await fetch('https://github.com/Moddable-OpenSource/moddable-xst/releases')
-        .then((r) => r.text());
-      const match = /href="\/Moddable-OpenSource\/moddable-xst\/releases\/tag\/v([^"]+)">/.exec(body);
-      return match[1];
+      const body = await fetch('https://api.github.com/repos/Moddable-OpenSource/moddable-xst/releases')
+        .then((r) => r.json());
+      return body.find((b) => !b.prerelease).tag_name.slice(1);
     }
     return version;
   }
