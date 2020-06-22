@@ -54,7 +54,11 @@ class GraalJSInstaller extends Installer {
 
   async install() {
     const root = `graalvm-ce-java11-${this.version}`;
-    this.binPath = await this.registerBinary(`${root}/languages/js/bin/js`, 'graaljs');
+    if (platform === 'darwin64') {
+      this.binPath = await this.registerBinary(`${root}/Contents/Home/languages/js/bin/js`, 'graaljs');
+    } else {
+      this.binPath = await this.registerBinary(`${root}/languages/js/bin/js`, 'graaljs');
+    }
   }
 
   async test() {
