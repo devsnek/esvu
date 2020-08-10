@@ -50,12 +50,10 @@ class HermesInstaller extends Installer {
     if (platform.startsWith('win')) {
       await this.registerAssets('*.dll');
       const hermes = await this.registerAsset('hermes.exe');
-      const hermesRepl = await this.registerAsset('hermes-repl.exe');
       this.binPath = await this.registerScript('hermes', `"${hermes}"`);
-      await this.registerScript('hermes-repl', `"${hermesRepl}"`);
     } else {
       this.binPath = await this.registerBinary('hermes');
-      await this.registerBinary('hermes-repl');
+      await this.registerBinary('hermes');
     }
   }
 
