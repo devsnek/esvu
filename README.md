@@ -34,7 +34,7 @@ installing engines to make eshost automatically find the installed engines.
 | [Chakra][]         | `ch`, `chakra`                   | ✅         |           | ✅        | ✅      | ✅      |
 | [engine262][]      | `engine262`                      | ✅         | ✅        | ✅        | ✅      | ✅      |
 | [GraalJS][]        | `graaljs`                        | ✅         |           | ✅        |         | ✅      |
-| [Hermes][]         | `hermes`                         | ✅         |           | ✅        |         | ✅      |
+| [Hermes][]         | `hermes`                         | ✅         |           |           |         | ✅      |
 | [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅         | ✅        | ✅        | ✅      | ✅      |
 | [QuickJS][]        | `quickjs`, `quickjs-run-test262` |            |           | ✅        |         |         |
 | [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅         | ✅        | ✅        | ✅      | ✅      |

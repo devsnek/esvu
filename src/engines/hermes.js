@@ -74,7 +74,7 @@ class HermesInstaller extends Installer {
 HermesInstaller.config = {
   name: 'Hermes',
   id: 'hermes',
-  supported: ['linux64', 'win64', 'darwin64'],
+  supported: ['win64', 'darwin64'],
 };
 
 module.exports = HermesInstaller;
