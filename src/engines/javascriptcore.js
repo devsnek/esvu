@@ -39,19 +39,10 @@ class JavaScriptCoreInstaller extends Installer {
   static async resolveVersion(version) {
     if (version === 'latest') {
       switch (platform) {
-        case 'linux32':
-        case 'linux64': {
-          const body = await fetch(`https://webkitgtk.org/jsc-built-products/x86_${platform === 'linux32' ? '32' : '64'}/release/?C=M;O=D`)
-            .then((r) => r.text());
-          // Check for the most recent *.sha256sum file rather than the
-          // most recent *.zip file to avoid the race condition where the
-          // ZIP file has not fully been uploaded yet. The *.sha256sum
-          // files are written last, so once one is available the
-          // corresponding ZIP file is guaranteed to be available.
-          // https://mths.be/bww
-          const match = /<a href="(\d+)\.sha256sum">/.exec(body);
-          return match[1];
-        }
+        case 'linux64':
+          return fetch('https://webkitgtk.org/jsc-built-products/x86_64/release/LAST-IS')
+            .then((r) => r.text())
+            .then((n) => n.trim().replace('.zip', ''));
         case 'win32': {
           const body = await fetch('https://build.webkit.org/builders/Apple%20Win%2010%20Release%20(Build)?numbuilds=25')
             .then((r) => r.text());
@@ -153,7 +144,7 @@ JavaScriptCoreInstaller.config = {
     },
   ] : undefined,
   supported: [
-    'linux32', 'linux64',
+    'linux64',
     'win32', 'win64',
     'darwin64',
   ],
