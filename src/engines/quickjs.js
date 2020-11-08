@@ -46,10 +46,14 @@ class QuickJSInstaller extends Installer {
   }
 
   async install() {
-    this.binPath = await this.registerBinary(platform.startsWith('win') ? 'qjs.exe' : 'qjs', 'quickjs');
     if (!platform.startsWith('win')) {
+      this.binPath = await this.registerBinary('qjs', 'quickjs');
       // for eshost
       await this.registerBinary('run-test262', 'quickjs-run-test262');
+    } else {
+      await this.registerAsset('libwinpthread-1.dll');
+      const qjs = await this.registerAsset('qjs.exe');
+      this.binPath = await this.registerScript('qjs', `"${qjs}"`);
     }
   }
 
