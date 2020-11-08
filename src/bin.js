@@ -16,6 +16,7 @@ const { argv } = yargs
   .command('uninstall <engine>', 'Uninstall <engine>')
   .command('update <engine>', 'Update <engine>')
   .option('engines')
+  .option('fast')
   .strict();
 
 const logger = new Logger('esvu');
@@ -143,12 +144,20 @@ async function updateAll() {
     process.exit(1);
   }
 
-  for (const engine of status.selectedEngines) {
+  const i = async (engine) => {
     try {
-      await installEngine(engine); // eslint-disable-line no-await-in-loop
+      await installEngine(engine);
     } catch (e) {
       logger.fatal(`Fatal error installing ${getInstaller(engine).config.name}`, e);
       process.exitCode = 1;
+    }
+  };
+
+  if (argv.fast) {
+    await Promise.all(status.selectedEngines.map(i));
+  } else {
+    for (const engine of status.selectedEngines) {
+      await i(engine); // eslint-disable-line no-await-in-loop
     }
   }
 }

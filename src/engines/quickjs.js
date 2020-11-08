@@ -10,6 +10,12 @@ function getFilename() {
   switch (platform) {
     case 'linux64':
       return 'linux-x86_64';
+    case 'linux32':
+      return 'linux-i686';
+    case 'win32':
+      return 'win-i686';
+    case 'win64':
+      return 'win-x86_64';
     default:
       throw new Error(`No QuickJS builds available for ${platform}`);
   }
@@ -59,7 +65,10 @@ class QuickJSInstaller extends Installer {
 QuickJSInstaller.config = {
   name: 'QuickJS',
   id: 'qjs',
-  supported: ['linux64'],
+  supported: [
+    'linux32', 'linux64',
+    'win32', 'win64',
+  ],
 };
 
 module.exports = QuickJSInstaller;
