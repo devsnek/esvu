@@ -44,22 +44,19 @@ class JavaScriptCoreInstaller extends Installer {
             .then((r) => r.text())
             .then((n) => n.trim().replace('.zip', ''));
         case 'win32': {
-          const body = await fetch('https://build.webkit.org/builders/Apple%20Win%2010%20Release%20(Build)?numbuilds=25')
-            .then((r) => r.text());
-          const match = /<td><span[^>]+><a href="[^"]+">(\d+)<\/a><\/span><\/td>\s*<td class="success">success<\/td>/.exec(body);
-          return match[1];
+          const body = await fetch('https://build.webkit.org/api/v2/builders/67/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
+            .then((r) => r.json());
+          return body.builds[0].properties.got_revision[0];
         }
         case 'win64': {
-          const body = await fetch('https://build.webkit.org/builders/WinCairo%2064-bit%20WKL%20Release%20%28Build%29?numbuilds=25')
-            .then((r) => r.text());
-          const match = /<td><span[^>]+><a href="[^"]+">(\d+)<\/a><\/span><\/td>\s*<td class="success">success<\/td>/.exec(body);
-          return match[1];
+          const body = await fetch('https://build.webkit.org/api/v2/builders/27/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
+            .then((r) => r.json());
+          return body.builds[0].properties.got_revision[0];
         }
         case 'darwin64': {
-          const body = await fetch('https://build.webkit.org/builders/Apple-Catalina-Release-Build?numbuilds=25')
-            .then((r) => r.text());
-          const match = /<td><span[^>]+><a href="[^"]+">(\d+)<\/a><\/span><\/td>\s*<td class="success">success<\/td>/.exec(body);
-          return match[1];
+          const body = await fetch('https://build.webkit.org/api/v2/builders/54/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
+            .then((r) => r.json());
+          return body.builds[0].properties.got_revision[0];
         }
         default:
           throw new RangeError(`Unknown platform ${platform}`);
