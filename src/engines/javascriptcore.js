@@ -43,11 +43,6 @@ class JavaScriptCoreInstaller extends Installer {
           return fetch('https://webkitgtk.org/jsc-built-products/x86_64/release/LAST-IS')
             .then((r) => r.text())
             .then((n) => n.trim().replace('.zip', ''));
-        case 'win32': {
-          const body = await fetch('https://build.webkit.org/api/v2/builders/67/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
-            .then((r) => r.json());
-          return body.builds[0].properties.got_revision[0];
-        }
         case 'win64': {
           const body = await fetch('https://build.webkit.org/api/v2/builders/27/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
             .then((r) => r.json());
@@ -73,8 +68,6 @@ class JavaScriptCoreInstaller extends Installer {
         return `https://webkitgtk.org/jsc-built-products/x86_32/release/${version}.zip`;
       case 'linux64':
         return `https://webkitgtk.org/jsc-built-products/x86_64/release/${version}.zip`;
-      case 'win32':
-        return `https://s3-us-west-2.amazonaws.com/archives.webkit.org/win-i386-release/${version}.zip`;
       case 'win64':
         return `https://s3-us-west-2.amazonaws.com/archives.webkit.org/wincairo-x86_64-release/${version}.zip`;
       default:
@@ -105,7 +98,6 @@ class JavaScriptCoreInstaller extends Installer {
         await this.registerScript('jsc', source);
         break;
       }
-      case 'win32':
       case 'win64': {
         await this.registerAssets('bin64/JavaScriptCore.resources/*');
         await this.registerAssets('bin64/*.dll');
@@ -142,7 +134,7 @@ JavaScriptCoreInstaller.config = {
   ] : undefined,
   supported: [
     'linux64',
-    'win32', 'win64',
+    'win64',
     'darwin64',
   ],
 };
