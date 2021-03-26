@@ -15,9 +15,9 @@ function getFilename() {
     case 'linux-x64':
       return 'linux-x86_64';
     case 'win32-ia32':
-      return 'win32-ia32';
+      return 'win32';
     case 'win32-x64':
-      return 'win32-x64';
+      return 'win64';
     default:
       throw new Error(`No SpiderMonkey builds available for ${platform}`);
   }

@@ -10,6 +10,8 @@ function getFilename(os) {
   switch (os) {
     case 'darwin-x64':
       return 'mac64';
+    case 'darwin-arm64':
+      return 'mac-arm64';
     case 'linux-ia32':
       return 'linux32';
     case 'linux-x64':
@@ -86,7 +88,7 @@ V8Installer.config = {
   supported: [
     'linux-ia32', 'linux-x64',
     'win32-ia32', 'win32-x64',
-    'darwin-x64',
+    'darwin-x64', 'darwin-arm64',
   ],
 };
 
