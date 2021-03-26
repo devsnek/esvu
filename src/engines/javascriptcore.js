@@ -39,16 +39,16 @@ class JavaScriptCoreInstaller extends Installer {
   static async resolveVersion(version) {
     if (version === 'latest') {
       switch (platform) {
-        case 'linux64':
+        case 'linux-x64':
           return fetch('https://webkitgtk.org/jsc-built-products/x86_64/release/LAST-IS')
             .then((r) => r.text())
             .then((n) => n.trim().replace('.zip', ''));
-        case 'win64': {
+        case 'win32-x64': {
           const body = await fetch('https://build.webkit.org/api/v2/builders/27/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
             .then((r) => r.json());
           return body.builds[0].properties.got_revision[0];
         }
-        case 'darwin64': {
+        case 'darwin-x64': {
           const body = await fetch('https://build.webkit.org/api/v2/builders/54/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
             .then((r) => r.json());
           return body.builds[0].properties.got_revision[0];
@@ -62,13 +62,13 @@ class JavaScriptCoreInstaller extends Installer {
 
   getDownloadURL(version) {
     switch (platform) {
-      case 'darwin64':
+      case 'darwin-x64':
         return `https://s3-us-west-2.amazonaws.com/minified-archives.webkit.org/mac-catalina-x86_64-release/${version}.zip`;
-      case 'linux32':
+      case 'linux-ia32':
         return `https://webkitgtk.org/jsc-built-products/x86_32/release/${version}.zip`;
-      case 'linux64':
+      case 'linux-x64':
         return `https://webkitgtk.org/jsc-built-products/x86_64/release/${version}.zip`;
-      case 'win64':
+      case 'win32-x64':
         return `https://s3-us-west-2.amazonaws.com/archives.webkit.org/wincairo-x86_64-release/${version}.zip`;
       default:
         throw new RangeError(`Unknown platform ${platform}`);
@@ -81,7 +81,7 @@ class JavaScriptCoreInstaller extends Installer {
 
   async install() {
     switch (platform) {
-      case 'darwin64': {
+      case 'darwin-x64': {
         await this.registerAssets('Release/JavaScriptCore.framework/**');
         const jsc = await this.registerAsset('Release/jsc');
         const source = `DYLD_FRAMEWORK_PATH="${this.installPath}/Release" DYLD_LIBRARY_PATH="${this.installPath}/Release" "${jsc}"`;
@@ -89,16 +89,16 @@ class JavaScriptCoreInstaller extends Installer {
         await this.registerScript('jsc', source);
         break;
       }
-      case 'linux32':
-      case 'linux64': {
+      case 'linux-ia32':
+      case 'linux-x64': {
         await this.registerAssets('lib/*');
         const jsc = await this.registerAsset('bin/jsc');
-        const source = `LD_LIBRARY_PATH="${this.installPath}/lib" exec "${this.installPath}/lib/ld-linux${platform === 'linux64' ? '-x86-64' : ''}.so.2" "${jsc}"`;
+        const source = `LD_LIBRARY_PATH="${this.installPath}/lib" exec "${this.installPath}/lib/ld-linux${platform === 'linux-x64' ? '-x86-64' : ''}.so.2" "${jsc}"`;
         this.binPath = await this.registerScript('javascriptcore', source);
         await this.registerScript('jsc', source);
         break;
       }
-      case 'win64': {
+      case 'win32-x64': {
         await this.registerAssets('bin64/JavaScriptCore.resources/*');
         await this.registerAssets('bin64/*.dll');
         await this.registerAssets('bin64/*.pdb');
@@ -133,9 +133,9 @@ JavaScriptCoreInstaller.config = {
     },
   ] : undefined,
   supported: [
-    'linux64',
-    'win64',
-    'darwin64',
+    'linux-x64',
+    'win32-x64',
+    'darwin-x64',
   ],
 };
 

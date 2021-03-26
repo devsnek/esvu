@@ -8,13 +8,13 @@ const { platform, unzip } = require('../common');
 
 function getFilename() {
   switch (platform) {
-    case 'linux64':
+    case 'linux-x64':
       return 'linux-x86_64';
-    case 'linux32':
+    case 'linux-ia32':
       return 'linux-i686';
-    case 'win32':
+    case 'win32-ia32':
       return 'win-i686';
-    case 'win64':
+    case 'win32-x64':
       return 'win-x86_64';
     default:
       throw new Error(`No QuickJS builds available for ${platform}`);
@@ -72,8 +72,8 @@ QuickJSInstaller.config = {
   name: 'QuickJS',
   id: 'qjs',
   supported: [
-    'linux32', 'linux64',
-    'win32', 'win64',
+    'linux-ia32', 'linux-x64',
+    'win32-ia32', 'win32-x64',
   ],
 };
 

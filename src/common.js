@@ -47,9 +47,7 @@ function rmdir(dir) {
 }
 
 function guessPlatform() {
-  const platform = os.platform().replace('32', '');
-  const arch = os.arch().includes('64') ? '64' : '32';
-  return `${platform}${arch}`;
+  return `${os.platform()}-${os.arch()}`;
 }
 
 async function unzip(from, to) {

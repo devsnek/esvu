@@ -8,11 +8,11 @@ const { platform, untar, unzip } = require('../common');
 
 function getFilename() {
   switch (platform) {
-    case 'darwin64':
+    case 'darwin-x64':
       return 'darwin-amd64';
-    case 'linux64':
+    case 'linux-x64':
       return 'linux-amd64';
-    case 'win64':
+    case 'win32-x64':
       return 'windows-amd64';
     default:
       throw new Error(`No GraalJS builds available for ${platform}`);
@@ -54,7 +54,7 @@ class GraalJSInstaller extends Installer {
 
   async install() {
     const root = `graalvm-ce-java11-${this.version}`;
-    if (platform === 'darwin64') {
+    if (platform === 'darwin-x64') {
       this.binPath = await this.registerBinary(`${root}/Contents/Home/languages/js/bin/js`, 'graaljs');
     } else {
       this.binPath = await this.registerBinary(`${root}/languages/js/bin/js`, 'graaljs');
@@ -76,7 +76,7 @@ GraalJSInstaller.config = {
   name: 'GraalJS',
   id: 'graaljs',
   supported: [
-    'linux64', 'win64', 'darwin64',
+    'linux-x64', 'win32-x64', 'darwin-x64',
   ],
 };
 

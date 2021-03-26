@@ -8,15 +8,15 @@ const { platform, unzip } = require('../common');
 
 function getFilename(os) {
   switch (os) {
-    case 'darwin64':
+    case 'darwin-x64':
       return 'mac64';
-    case 'linux32':
+    case 'linux-ia32':
       return 'linux32';
-    case 'linux64':
+    case 'linux-x64':
       return 'linux64';
-    case 'win32':
+    case 'win32-ia32':
       return 'win32';
-    case 'win64':
+    case 'win32-x64':
       return 'win64';
     default:
       throw new Error(`No V8 builds available for ${os}`);
@@ -84,9 +84,9 @@ V8Installer.config = {
   name: 'V8',
   id: 'v8',
   supported: [
-    'linux32', 'linux64',
-    'win32', 'win64',
-    'darwin64',
+    'linux-ia32', 'linux-x64',
+    'win32-ia32', 'win32-x64',
+    'darwin-x64',
   ],
 };
 

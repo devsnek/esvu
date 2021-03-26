@@ -11,12 +11,12 @@ const { platform, unzip, untar } = require('../common');
 
 function getFilename() {
   switch (platform) {
-    case 'darwin64':
+    case 'darwin-x64':
       return 'osx_x64';
-    case 'linux64':
+    case 'linux-x64':
       return 'linux_x64';
-    case 'win32':
-    case 'win64':
+    case 'win32-ia32':
+    case 'win32-x64':
       return 'windows_all';
     default:
       throw new Error(`No Chakra builds available for ${platform}`);
@@ -53,7 +53,7 @@ class ChakraInstaller extends Installer {
 
   async install() {
     if (platform.startsWith('win')) {
-      const root = platform === 'win32' ? 'x86_release' : 'x64_release';
+      const root = platform === 'win32-ia32' ? 'x86_release' : 'x64_release';
       await this.registerAssets(`${root}/*.pdb`);
       await this.registerAssets(`${root}/*.dll`);
       const ch = await this.registerAsset(`${root}/ch.exe`);
@@ -83,7 +83,7 @@ class ChakraInstaller extends Installer {
 ChakraInstaller.config = {
   name: 'Chakra',
   id: 'ch',
-  supports: ['linux64', 'darwin64', 'win32', 'win64'],
+  supports: ['linux-x64', 'darwin-x64', 'win32-ia32', 'win32-x64'],
 };
 
 module.exports = ChakraInstaller;

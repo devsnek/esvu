@@ -8,16 +8,16 @@ const { platform, unzip } = require('../common');
 
 function getFilename() {
   switch (platform) {
-    case 'darwin64':
+    case 'darwin-x64':
       return 'mac';
     case 'linx32':
       return 'linux-i686';
-    case 'linux64':
+    case 'linux-x64':
       return 'linux-x86_64';
-    case 'win32':
-      return 'win32';
-    case 'win64':
-      return 'win64';
+    case 'win32-ia32':
+      return 'win32-ia32';
+    case 'win32-x64':
+      return 'win32-x64';
     default:
       throw new Error(`No SpiderMonkey builds available for ${platform}`);
   }
@@ -77,13 +77,13 @@ class SpiderMonkeyInstaller extends Installer {
 
   async install() {
     switch (platform) {
-      case 'darwin64':
+      case 'darwin-x64':
         await this.registerAssets('*.dylib');
         await this.registerBinary('js', 'sm');
         this.binPath = await this.registerBinary('js', 'spidermonkey');
         break;
-      case 'linux32':
-      case 'linux64': {
+      case 'linux-ia32':
+      case 'linux-x64': {
         await this.registerAssets('*.so');
         const sm = await this.registerAsset('js');
         const source = `LD_LIBRARY_PATH="${this.installPath}" "${sm}"`;
@@ -91,8 +91,8 @@ class SpiderMonkeyInstaller extends Installer {
         await this.registerScript('sm', source);
         break;
       }
-      case 'win32':
-      case 'win64': {
+      case 'win32-ia32':
+      case 'win32-x64': {
         await this.registerAssets('*.dll');
         const sm = await this.registerAsset('js.exe');
         this.binPath = await this.registerScript('spidermonkey', `"${sm}"`);
@@ -119,9 +119,9 @@ SpiderMonkeyInstaller.config = {
   name: 'SpiderMonkey',
   id: 'jsshell',
   supported: [
-    'linux32', 'linux64',
-    'win32', 'win64',
-    'darwin64',
+    'linux-ia32', 'linux-x64',
+    'win32-ia32', 'win32-x64',
+    'darwin-x64',
   ],
 };
 

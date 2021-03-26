@@ -11,11 +11,11 @@ const { platform, untar } = require('../common');
 
 function getFilename() {
   switch (platform) {
-    case 'linux64':
+    case 'linux-x64':
       return 'linux';
-    case 'darwin64':
+    case 'darwin-x64':
       return 'darwin';
-    case 'win64':
+    case 'win32-x64':
       return 'windows';
     default:
       throw new Error(`No Hermes builds available for ${platform}`);
@@ -74,7 +74,7 @@ class HermesInstaller extends Installer {
 HermesInstaller.config = {
   name: 'Hermes',
   id: 'hermes',
-  supported: ['win64', 'darwin64'],
+  supported: ['win32-x64', 'darwin-x64'],
 };
 
 module.exports = HermesInstaller;

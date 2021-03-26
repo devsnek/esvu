@@ -8,14 +8,14 @@ const { platform, unzip } = require('../common');
 
 function getFilename() {
   switch (platform) {
-    case 'darwin64':
+    case 'darwin-x64':
       return 'mac';
-    case 'linux32':
+    case 'linux-ia32':
       return 'lin32';
-    case 'linux64':
+    case 'linux-x64':
       return 'lin64';
-    case 'win32':
-    case 'win64':
+    case 'win32-ia32':
+    case 'win32-x64':
       return 'win';
     default:
       throw new Error(`No XS builds available for ${platform}`);
@@ -70,9 +70,9 @@ XSInstaller.config = {
   name: 'XS',
   id: 'xs',
   supported: [
-    'linux32', 'linux64',
-    'win32', 'win64',
-    'darwin64',
+    'linux-ia32', 'linux-x64',
+    'win32-ia32', 'win32-x64',
+    'darwin-x64',
   ],
 };
 
