@@ -49,18 +49,15 @@ class QuickJSInstaller extends Installer {
   }
 
   async install() {
-    if (!platform.startsWith('win')) {
-      if (platform.startsWith('darwin')) {
-        this.binPath = await this.registerBinary('quickjs');
-      } else {
-        this.binPath = await this.registerBinary('qjs', 'quickjs');
-        // for eshost
-        await this.registerBinary('run-test262', 'quickjs-run-test262');
-      }
-    } else {
+    if (platform === 'darwin-x64') {
+      this.binPath = await this.registerBinary('quickjs');
+    } else if (platform.startsWith('win')) {
       await this.registerAsset('libwinpthread-1.dll');
       const qjs = await this.registerAsset('qjs.exe');
       this.binPath = await this.registerScript('qjs', `"${qjs}"`);
+    } else {
+      this.binPath = await this.registerBinary('qjs', 'quickjs');
+      await this.registerBinary('run-test262', 'quickjs-run-test262');
     }
   }
 
