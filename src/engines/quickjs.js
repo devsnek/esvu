@@ -38,7 +38,7 @@ class QuickJSInstaller extends Installer {
   }
 
   getDownloadURL(version) {
-    if (platform.startsWith('darwin')) {
+    if (platform === 'darwin-x64') {
       return 'https://github.com/napi-bindings/quickjs-build/releases/download/5.1.0/qjs-macOS.zip';
     }
     return `https://bellard.org/quickjs/binary_releases/quickjs-${getFilename()}-${version}.zip`;
