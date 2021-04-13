@@ -39,7 +39,7 @@ class QuickJSInstaller extends Installer {
 
   getDownloadURL(version) {
     if (platform === 'darwin-x64') {
-      return 'https://github.com/napi-bindings/quickjs-build/releases/download/5.1.0/qjs-macOS.zip';
+      return 'https://github.com/napi-bindings/quickjs-build/releases/download/5.2.0/qjs-macOS.zip';
     }
     return `https://bellard.org/quickjs/binary_releases/quickjs-${getFilename()}-${version}.zip`;
   }
@@ -51,6 +51,7 @@ class QuickJSInstaller extends Installer {
   async install() {
     if (platform === 'darwin-x64') {
       this.binPath = await this.registerBinary('quickjs');
+      await this.registerBinary('run-test262', 'quickjs-run-test262');
     } else if (platform.startsWith('win')) {
       await this.registerAsset('libwinpthread-1.dll');
       const qjs = await this.registerAsset('qjs.exe');
