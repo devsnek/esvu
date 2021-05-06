@@ -44,12 +44,12 @@ class JavaScriptCoreInstaller extends Installer {
             .then((r) => r.text())
             .then((n) => n.trim().replace('.zip', ''));
         case 'win32-x64': {
-          const body = await fetch('https://build.webkit.org/api/v2/builders/27/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
+          const body = await fetch('https://build.webkit.org/api/v2/builders/27/builds?limit=1&order=-number&property=got_revision&complete=true')
             .then((r) => r.json());
           return body.builds[0].properties.got_revision[0];
         }
         case 'darwin-x64': {
-          const body = await fetch('https://build.webkit.org/api/v2/builders/54/builds?limit=1&order=-number&property=owners&property=workername&property=got_revision&property=identifier')
+          const body = await fetch('https://build.webkit.org/api/v2/builders/54/builds?limit=1&order=-number&property=got_revision&complete=true')
             .then((r) => r.json());
           return body.builds[0].properties.got_revision[0];
         }
