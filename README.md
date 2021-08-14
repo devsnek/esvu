@@ -8,7 +8,12 @@ esvu is your one-stop shop for all implementations of ECMAScript.
 $ npm i -g esvu
 ```
 
-Add `~/.esvu/bin` to your `PATH`.
+esvu will attempt to respect `XDG_DATA_HOME`, and will fall back to the
+home directory. You will need to add esvu's bin to your `PATH`, for
+example `$XDG_DATA_HOME/.esvu/bin` or `/home/snek/.esvu/bin`.
+
+You may override the path entirely by setting the `ESVU_PATH` environment
+variable.
 
 ## Usage
 

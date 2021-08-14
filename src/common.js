@@ -7,7 +7,18 @@ const extractZip = require('extract-zip');
 const tar = require('tar');
 const rimraf = require('rimraf');
 
-const ESVU_PATH = path.join(os.homedir(), '.esvu');
+const ESVU_PATH = (() => {
+  const NEW_ESVU_PATH = process.env.ESVU_PATH || path.join(process.env.XDG_DATA_HOME || os.homedir(), '.esvu');
+  const OLD_ESVU_PATH = path.join(os.homedir(), '.esvu');
+
+  try {
+    fs.statSync(path.join(OLD_ESVU_PATH, 'status.json'));
+    return OLD_ESVU_PATH;
+  } catch {
+    return NEW_ESVU_PATH;
+  }
+})();
+
 const STATUS_PATH = path.join(ESVU_PATH, 'status.json');
 
 async function fileExists(file) {
