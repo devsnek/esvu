@@ -114,11 +114,12 @@ class JavaScriptCoreInstaller extends Installer {
 
   async test() {
     const program = 'print("42");';
-    const output = '42';
+    const output = (await execa(this.binPath, ['-e', program])).stdout;
+    const pattern = /^("?)42\1$/;
 
-    assert.strictEqual(
-      (await execa(this.binPath, ['-e', program])).stdout,
-      output,
+    assert(
+      pattern.test(output),
+      `Expected string "${output}" to match pattern ${pattern}`,
     );
   }
 }
