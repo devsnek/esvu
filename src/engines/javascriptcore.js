@@ -21,7 +21,7 @@ const execa = require('execa');
 const Installer = require('../installer');
 const { platform, unzip } = require('../common');
 
-function buildURL(builer) {
+function buildURL(builder) {
   return `https://build.webkit.org/api/v2/builders/${builder}/builds?limit=1&order=-number&property=got_revision&complete=true`;
 }
 
