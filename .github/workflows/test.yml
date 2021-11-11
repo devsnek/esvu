@@ -8,7 +8,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         # https://nodejs.org/en/about/releases/
-        node: [12, 14, 16, 17]
+        node: [14, 16, 17]
     runs-on: ${{ matrix.os }}
     steps:
       # https://github.com/actions/checkout/issues/135
