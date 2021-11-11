@@ -21,6 +21,10 @@ const execa = require('execa');
 const Installer = require('../installer');
 const { platform, unzip } = require('../common');
 
+function buildURL(builder) {
+  return `https://build.webkit.org/api/v2/builders/${builder}/builds?limit=1&order=-number&property=got_revision&complete=true`;
+}
+
 class JavaScriptCoreInstaller extends Installer {
   constructor(...args) {
     super(...args);
@@ -44,13 +48,15 @@ class JavaScriptCoreInstaller extends Installer {
             .then((r) => r.text())
             .then((n) => n.trim().replace('.zip', ''));
         case 'win32-x64': {
-          const body = await fetch('https://build.webkit.org/api/v2/builders/27/builds?limit=1&order=-number&property=got_revision&complete=true')
-            .then((r) => r.json());
+          const body = await fetch(buildURL(27)).then((r) => r.json());
           return body.builds[0].properties.got_revision[0];
         }
         case 'darwin-x64': {
-          const body = await fetch('https://build.webkit.org/api/v2/builders/54/builds?limit=1&order=-number&property=got_revision&complete=true')
-            .then((r) => r.json());
+          const body = await fetch(buildURL(54)).then((r) => r.json());
+          return body.builds[0].properties.got_revision[0];
+        }
+        case 'darwin-arm64': {
+          const body = await fetch(buildURL(29)).then((r) => r.json());
           return body.builds[0].properties.got_revision[0];
         }
         default:
@@ -64,6 +70,8 @@ class JavaScriptCoreInstaller extends Installer {
     switch (platform) {
       case 'darwin-x64':
         return `https://s3-us-west-2.amazonaws.com/minified-archives.webkit.org/mac-catalina-x86_64-release/${version}.zip`;
+      case 'darwin-arm64':
+        return `https://s3-us-west-2.amazonaws.com/minified-archives.webkit.org/mac-bigsur-x86_64%20arm64-release/${version}.zip`;
       case 'linux-ia32':
         return `https://webkitgtk.org/jsc-built-products/x86_32/release/${version}.zip`;
       case 'linux-x64':
@@ -81,7 +89,8 @@ class JavaScriptCoreInstaller extends Installer {
 
   async install() {
     switch (platform) {
-      case 'darwin-x64': {
+      case 'darwin-x64':
+      case 'darwin-arm64': {
         await this.registerAssets('Release/JavaScriptCore.framework/**');
         const jsc = await this.registerAsset('Release/jsc');
         const source = `DYLD_FRAMEWORK_PATH="${this.installPath}/Release" DYLD_LIBRARY_PATH="${this.installPath}/Release" "${jsc}"`;
@@ -137,6 +146,7 @@ JavaScriptCoreInstaller.config = {
     'linux-x64',
     'win32-x64',
     'darwin-x64',
+    'darwin-arm64',
   ],
 };
 

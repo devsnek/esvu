@@ -9,6 +9,7 @@ const { platform, unzip } = require('../common');
 function getFilename() {
   switch (platform) {
     case 'darwin-x64':
+    case 'darwin-arm64':
       return 'mac';
     case 'linx32':
       return 'linux-i686';
@@ -78,6 +79,7 @@ class SpiderMonkeyInstaller extends Installer {
   async install() {
     switch (platform) {
       case 'darwin-x64':
+      case 'darwin-arm64':
         await this.registerAssets('*.dylib');
         await this.registerBinary('js', 'sm');
         this.binPath = await this.registerBinary('js', 'spidermonkey');
@@ -121,7 +123,7 @@ SpiderMonkeyInstaller.config = {
   supported: [
     'linux-ia32', 'linux-x64',
     'win32-ia32', 'win32-x64',
-    'darwin-x64',
+    'darwin-x64', 'darwin-arm64',
   ],
 };
 
