@@ -19,6 +19,10 @@ function getFilename() {
   }
 }
 
+function getArchiveExtension() {
+  return platform.startsWith('win') ? '.zip' : '.tar.gz';
+}
+
 class GraalJSInstaller extends Installer {
   constructor(...args) {
     super(...args);
@@ -44,7 +48,7 @@ class GraalJSInstaller extends Installer {
   }
 
   async getDownloadURL(version) {
-    return `https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${version}/graalvm-ce-java11-${getFilename()}-${version}.tar.gz`;
+    return `https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${version}/graalvm-ce-java11-${getFilename()}-${version}${getArchiveExtension()}`;
   }
 
   async extract() {
@@ -58,8 +62,13 @@ class GraalJSInstaller extends Installer {
   async install() {
     const root = `graalvm-ce-java11-${this.version}`;
     if (platform === 'darwin-x64') {
+      await this.registerAsset(`${root}/Contents/Home/languages/js/lib/libjsvm.dylib`);
       this.binPath = await this.registerBinary(`${root}/Contents/Home/languages/js/bin/js`, 'graaljs');
+    } else if (platform === 'win32-x64') {
+      await this.registerAsset(`${root}/languages/js/lib/jsvm.dll`);
+      this.binPath = await this.registerBinary(`${root}/languages/js/bin/js.exe`, 'graaljs.exe');
     } else {
+      await this.registerAsset(`${root}/languages/js/lib/libjsvm.so`);
       this.binPath = await this.registerBinary(`${root}/languages/js/bin/js`, 'graaljs');
     }
   }
