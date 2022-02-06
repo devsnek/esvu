@@ -44,7 +44,7 @@ installing engines to make eshost automatically find the installed engines.
 | [QuickJS][]        | `quickjs`, `quickjs-run-test262` | ✅           |                | ✅           | ✅          | ✅           | ✅          |
 | [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
 | [V8][]             | `v8`                             | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
-| [XS][]             | `xs`                             | ✅           |                | ✅           | ✅          | ✅           | ✅          |
+| [XS][]             | `xs`                             | ✅           |                | ✅           | ✅          |              | ✅          |
 
 Some binaries may be exposed as batch/shell scripts to properly handling shared library loading. Some binaries on
 64-bit systems may be natively 32-bit.
