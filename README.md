@@ -40,6 +40,7 @@ installing engines to make eshost automatically find the installed engines.
 | [engine262][]      | `engine262`                      | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
 | [GraalJS][]        | `graaljs`                        | ✅           |                |              | ✅          |              | ✅          |
 | [Hermes][]         | `hermes`                         | ✅           |                |              |             |              | ✅          |
+| [LibJS][]          | `serenity-js`                    |              |                |              | ✅          |              |             |
 | [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅           | ✅             |              | ✅          |              | ✅          |
 | [QuickJS][]        | `quickjs`, `quickjs-run-test262` | ✅           |                | ✅           | ✅          | ✅           | ✅          |
 | [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
@@ -54,6 +55,7 @@ Some binaries may be exposed as batch/shell scripts to properly handling shared 
 [engine262]: https://engine262.js.org
 [GraalJS]: https://github.com/graalvm/graaljs
 [Hermes]: https://hermesengine.dev
+[LibJS]: https://github.com/serenityos/serenity
 [JavaScriptCore]: https://developer.apple.com/documentation/javascriptcore
 [QuickJS]: https://bellard.org/quickjs/
 [SpiderMonkey]: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey
