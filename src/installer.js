@@ -12,6 +12,8 @@ const fetch = require('node-fetch');
 const { ESVU_PATH, ensureDirectory, symlink, platform, rmdir } = require('./common');
 const Logger = require('./logger');
 
+const DL_FILE_PREFIX = 'esvu-';
+
 function hash(string) {
   const h = crypto.createHash('md5');
   h.update(string);
@@ -67,7 +69,7 @@ class EngineInstaller {
           throw new Error(`Got ${r.status}`);
         }
         const rURL = new URL(r.url);
-        const l = path.join(os.tmpdir(), hash(url) + path.extname(rURL.pathname));
+        const l = path.join(os.tmpdir(), DL_FILE_PREFIX + hash(url) + path.extname(rURL.pathname));
         const sink = fs.createWriteStream(l);
         const progress = logger.progress(+r.headers.get('content-length'));
         await new Promise((resolve, reject) => {
@@ -176,6 +178,9 @@ class EngineInstaller {
         }
       });
     });
+    if (files.length === 0) {
+      throw new Error(`No files matched ${pattern}`);
+    }
     await Promise.all(files.map((file) =>
       this.registerAsset(path.relative(this.extractedPath, file))));
   }
