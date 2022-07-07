@@ -34,11 +34,6 @@ class GraalJSInstaller extends Installer {
     this.binPath = undefined;
   }
 
-  static shouldInstallByDefault() {
-    // Graal VM archives are >400mb, so don't download by default.
-    return false;
-  }
-
   static async resolveVersion(version) {
     if (version === 'latest') {
       const body = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
