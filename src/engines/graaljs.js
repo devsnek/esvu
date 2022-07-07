@@ -9,7 +9,7 @@ const { platform, untar, unzip } = require('../common');
 function getFilename() {
   switch (platform) {
     case 'darwin-x64':
-      return 'darwin-amd64';
+      return 'macos-amd64';
     case 'linux-x64':
       return 'linux-amd64';
     case 'win32-x64':
@@ -37,7 +37,7 @@ class GraalJSInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const body = await fetch('https://api.github.com/repos/graalvm/graalvm-ce-builds/releases')
+      const body = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
         .then((r) => r.json());
       return body
         .filter((b) => !b.prerelease)
@@ -48,7 +48,7 @@ class GraalJSInstaller extends Installer {
   }
 
   async getDownloadURL(version) {
-    return `https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${version}/graalvm-ce-java11-${getFilename()}-${version}${getArchiveExtension()}`;
+    return `https://github.com/oracle/graaljs/releases/download/vm-${version}/graaljs-${version}-${getFilename()}${getArchiveExtension()}`;
   }
 
   async extract() {
@@ -60,20 +60,19 @@ class GraalJSInstaller extends Installer {
   }
 
   async install() {
-    const root = `graalvm-ce-java11-${this.version}`;
+    const root = `graaljs-${this.version}-${getFilename()}`;
+    let graaljs;
     if (platform === 'darwin-x64') {
-      await this.registerAsset(`${root}/Contents/Home/languages/js/graaljs.jar`);
-      await this.registerAsset(`${root}/Contents/Home/languages/js/lib/libjsvm.dylib`);
-      this.binPath = await this.registerBinary(`${root}/Contents/Home/languages/js/bin/js`, 'graaljs');
+      await this.registerAsset(`${root}/Contents/Home/lib/libjsvm.dylib`);
+      graaljs = await this.registerAsset(`${root}/Contents/Home/bin/js`);
     } else if (platform === 'win32-x64') {
-      await this.registerAsset(`${root}/languages/js/graaljs.jar`);
-      await this.registerAsset(`${root}/languages/js/lib/jsvm.dll`);
-      this.binPath = await this.registerBinary(`${root}/languages/js/bin/js.exe`, 'graaljs.exe');
+      await this.registerAsset(`${root}/lib/jsvm.dll`);
+      graaljs = await this.registerAsset(`${root}/bin/js.exe`);
     } else {
-      await this.registerAsset(`${root}/languages/js/graaljs.jar`);
-      await this.registerAsset(`${root}/languages/js/lib/libjsvm.so`);
-      this.binPath = await this.registerBinary(`${root}/languages/js/bin/js`, 'graaljs');
+      await this.registerAsset(`${root}/lib/libjsvm.so`);
+      graaljs = await this.registerAsset(`${root}/bin/js`);
     }
+    this.binPath = await this.registerScript('graaljs', `${graaljs}`);
   }
 
   async test() {
