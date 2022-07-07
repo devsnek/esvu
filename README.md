@@ -34,18 +34,18 @@ selected.
 If you're using [eshost-cli][], you can run `eshost --configure-esvu` after
 installing engines to make eshost automatically find the installed engines.
 
-| Engine             | Binary Names                     | `darwin-x64` | `darwin-arm64` | `linux-ia32` | `linux-x64` | `win32-ia32` | `win32-x64` |
-| ------------------ | -------------------------------- | ------------ | -------------- | ------------ | ----------- | ------------ | ----------- |
-| [Chakra][]         | `ch`, `chakra`                   | ✅           |                |              | ✅          | ✅           | ✅          |
-| [engine262][]      | `engine262`                      | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
-| [GraalJS][]        | `graaljs`                        | ✅           |                |              | ✅          |              | ✅          |
-| [Hermes][]         | `hermes`                         | ✅           |                |              |             |              | ✅          |
-| [LibJS][]          | `serenity-js`                    |              |                |              | ✅          |              |             |
-| [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅           | ✅             |              | ✅          |              | ✅          |
-| [QuickJS][]        | `quickjs`, `quickjs-run-test262` | ✅           |                | ✅           | ✅          | ✅           | ✅          |
-| [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
-| [V8][]             | `v8`                             | ✅           | ✅             | ✅           | ✅          | ✅           | ✅          |
-| [XS][]             | `xs`                             | ✅           |                | ✅           | ✅          |              | ✅          |
+| Engine             | Binary Names                     | `darwin-x64` | `darwin-arm64` | `linux-ia32` | `linux-x64` | `linux-arm64` | `win32-ia32` | `win32-x64` |
+| ------------------ | -------------------------------- | ------------ | -------------- | ------------ | ----------- | ------------- | ------------ | ----------- |
+| [Chakra][]         | `ch`, `chakra`                   | ✅           |                |              | ✅          |               | ✅           | ✅          |
+| [engine262][]      | `engine262`                      | ✅           | ✅             | ✅           | ✅          | ✅            | ✅           | ✅          |
+| [GraalJS][]        | `graaljs`                        | ✅           | ✅             |              | ✅          | ✅            |              | ✅          |
+| [Hermes][]         | `hermes`                         | ✅           |                |              |             |               |              | ✅          |
+| [LibJS][]          | `serenity-js`                    |              |                |              | ✅          |               |              |             |
+| [JavaScriptCore][] | `jsc`, `javascriptcore`          | ✅           | ✅             |              | ✅          |               |              | ✅          |
+| [QuickJS][]        | `quickjs`, `quickjs-run-test262` | ✅           |                | ✅           | ✅          |               | ✅           | ✅          |
+| [SpiderMonkey][]   | `sm`, `spidermonkey`             | ✅           | ✅             | ✅           | ✅          |               | ✅           | ✅          |
+| [V8][]             | `v8`                             | ✅           | ✅             | ✅           | ✅          |               | ✅           | ✅          |
+| [XS][]             | `xs`                             | ✅           |                | ✅           | ✅          |               |              | ✅          |
 
 Some binaries may be exposed as batch/shell scripts to properly handling shared library loading. Some binaries on
 64-bit systems may be natively 32-bit.
