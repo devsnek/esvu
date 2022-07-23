@@ -16,15 +16,17 @@ class Engine262Installer extends Installer {
 
   static resolveVersion(version) {
     if (version === 'latest') {
-      return fetch('https://api.engine262.js.org/latest-version')
+      return fetch('https://registry.npmjs.org/@engine262/engine262')
         .then((r) => r.json())
-        .then((b) => b.latest);
+        .then((b) => b['dist-tags'].latest);
     }
     return version;
   }
 
   getDownloadURL(version) {
-    return `https://api.engine262.js.org/download?version=${version}`;
+    return fetch('https://registry.npmjs.org/@engine262/engine262')
+      .then((r) => r.json())
+      .then((b) => b.versions[version].dist.tarball);
   }
 
   async extract() {
