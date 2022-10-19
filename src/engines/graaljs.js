@@ -67,8 +67,7 @@ class GraalJSInstaller extends Installer {
     } else if (platform === 'win32-x64') {
       await this.registerAsset(`${root}/lib/jsvm.dll`);
       graaljs = await this.registerAsset(`${root}/bin/js.exe`);
-    } else {
-      await this.registerAsset(`${root}/lib/libjsvm.so`);
+    } else {f
       graaljs = await this.registerAsset(`${root}/bin/js`);
     }
     this.binPath = await this.registerScript('graaljs', `${graaljs}`);
