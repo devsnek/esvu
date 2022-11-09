@@ -43,7 +43,7 @@ class SpiderMonkeyInstaller extends Installer {
               { term: { 'source.product': 'firefox' } },
               { term: { 'source.tree': 'mozilla-central' } },
               { term: { 'target.channel': 'nightly' } },
-              { term: { 'target.platform': getFilename() } },
+              { term: { 'target.platform': 'win64' } }, // Set 'win64' because buildhub only lists win* builds
             ],
           },
         },
