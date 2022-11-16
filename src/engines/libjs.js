@@ -77,9 +77,7 @@ class LibJSInstaller extends Installer {
 LibJSInstaller.config = {
   name: 'LibJS',
   id: 'libjs',
-  supported: [
-    'linux-x64',
-  ],
+  supported: [],
 };
 
 module.exports = LibJSInstaller;
