@@ -100,15 +100,22 @@ class GraalJSInstaller extends Installer {
 
   async install() {
     const root = `graaljs-${this.version}-${getFilename()}`;
+    const libjsvm = GraalJSVersion.from(this.version).majorVersion >= 22;
     let graaljs;
     if (platform.startsWith('darwin')) {
-      await this.registerAsset(`${root}/lib/libjsvm.dylib`);
+      if (libjsvm) {
+        await this.registerAsset(`${root}/lib/libjsvm.dylib`);
+      }
       graaljs = await this.registerAsset(`${root}/bin/js`);
     } else if (platform.startsWith('win')) {
-      await this.registerAsset(`${root}/lib/jsvm.dll`);
+      if (libjsvm) {
+        await this.registerAsset(`${root}/lib/jsvm.dll`);
+      }
       graaljs = await this.registerAsset(`${root}/bin/js.exe`);
     } else {
-      await this.registerAsset(`${root}/lib/libjsvm.so`);
+      if (libjsvm) {
+        await this.registerAsset(`${root}/lib/libjsvm.so`);
+      }
       graaljs = await this.registerAsset(`${root}/bin/js`);
     }
     this.binPath = await this.registerScript('graaljs', `${graaljs}`);
