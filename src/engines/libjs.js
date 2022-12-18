@@ -7,10 +7,14 @@ const path = require('path');
 const Installer = require('../installer');
 const { platform, unzip, untar } = require('../common');
 
-function checkPlatform() {
+function getFilename() {
   switch (platform) {
     case 'linux-x64':
-      return;
+      return 'Linux-x86_64';
+    case 'darwin-x64':
+      return 'macOS-universal2';
+    case 'darwin-arm64':
+      return 'macOS-universal2';
     default:
       throw new Error(`LibJS does not have binary builds for ${platform}`);
   }
@@ -24,25 +28,25 @@ class LibJSInstaller extends Installer {
   }
 
   static async resolveVersion(version) {
-    checkPlatform();
+    const artifactName = `serenity-js-${getFilename()}`;
     if (version !== 'latest') {
       throw new Error('LibJS only provides binary builds for \'latest\'');
     }
 
     const artifactId = await fetch('https://api.github.com/repos/serenityos/serenity/actions/artifacts')
       .then((x) => x.json())
-      .then((x) => x.artifacts.filter((a) => a.name === 'serenity-js'))
+      .then((x) => x.artifacts.filter((a) => a.name === artifactName))
       .then((x) => x[0].id)
       .catch(() => {
-        throw new Error('Failed to find any releases for serenity-js on SerenityOS/serenity');
+        throw new Error(`Failed to find any releases for ${artifactName} on SerenityOS/serenity`);
       });
     const runId = await fetch('https://api.github.com/repos/serenityos/serenity/actions/runs?event=push&branch=master&status=success')
       .then((x) => x.json())
-      .then((x) => x.workflow_runs.filter((a) => a.name === 'Run test262 with LibJS and push results to the website repo'))
+      .then((x) => x.workflow_runs.filter((a) => a.name === 'Package the js repl as a binary artifact'))
       .then((x) => x.sort((a, b) => a.check_suite_id > b.check_suite_id))
       .then((x) => x[0].check_suite_id)
       .catch(() => {
-        throw new Error('Failed to find any recent serenity-js build run');
+        throw new Error('Failed to find any recent serenity-js build');
       });
     return `${runId}/${artifactId}`;
   }
@@ -54,12 +58,12 @@ class LibJSInstaller extends Installer {
 
   async extract() {
     await unzip(this.downloadPath, `${this.extractedPath}zip`);
-    await untar(path.join(`${this.extractedPath}zip`, 'serenity-js.tar.gz'), this.extractedPath);
+    await untar(path.join(`${this.extractedPath}zip`, `serenity-js-${getFilename()}.tar.gz`), this.extractedPath);
   }
 
   async install() {
-    await this.registerAssets('serenity-js/lib/*.so*');
-    const js = await this.registerAsset('serenity-js/bin/js');
+    await this.registerAssets('lib/**');
+    const js = await this.registerAsset('bin/js');
     this.binPath = await this.registerScript('serenity-js', `"${js}"`);
   }
 
@@ -77,7 +81,11 @@ class LibJSInstaller extends Installer {
 LibJSInstaller.config = {
   name: 'LibJS',
   id: 'libjs',
-  supported: [],
+  supported: [
+    'linux-x64',
+    'darwin-x64',
+    'darwin-arm64',
+  ],
 };
 
 module.exports = LibJSInstaller;
