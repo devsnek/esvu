@@ -16,6 +16,8 @@ function getFilename() {
       return 'win-i686';
     case 'win32-x64':
       return 'win-x86_64';
+    case 'linux-arm64':
+      return 'linux-aarch64';
     default:
       throw new Error(`No QuickJS builds available for ${platform}`);
   }
@@ -29,6 +31,9 @@ class QuickJSInstaller extends Installer {
   }
 
   static resolveVersion(version) {
+    if (['darwin-arm64', 'darwin-x64', 'linux-arm64'].includes(platform)) {
+      return '6.0.0';
+    }
     if (version === 'latest') {
       return fetch('https://bellard.org/quickjs/binary_releases/LATEST.json')
         .then((r) => r.json())
@@ -38,8 +43,14 @@ class QuickJSInstaller extends Installer {
   }
 
   getDownloadURL(version) {
+    if (platform === 'darwin-arm64') {
+      return `https://github.com/napi-bindings/quickjs-build/releases/download/${version}/qjs-macOS-arm64.zip`;
+    }
     if (platform === 'darwin-x64') {
-      return 'https://github.com/napi-bindings/quickjs-build/releases/download/5.2.0/qjs-macOS.zip';
+      return `https://github.com/napi-bindings/quickjs-build/releases/download/${version}/qjs-macOS.zip`;
+    }
+    if (platform === 'linux-arm64') {
+      return `https://github.com/napi-bindings/quickjs-build/releases/download/${version}/qjs-linux-arm64.zip`;
     }
     return `https://bellard.org/quickjs/binary_releases/quickjs-${getFilename()}-${version}.zip`;
   }
@@ -49,7 +60,7 @@ class QuickJSInstaller extends Installer {
   }
 
   async install() {
-    if (platform === 'darwin-x64') {
+    if (platform === 'darwin-x64' || platform === 'darwin-arm64' || platform === 'linux-arm64') {
       this.binPath = await this.registerBinary('quickjs');
       await this.registerBinary('run-test262', 'quickjs-run-test262');
     } else if (platform.startsWith('win')) {
