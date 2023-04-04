@@ -6,7 +6,7 @@ const execa = require('execa');
 const Installer = require('../installer');
 const { platform, unzip } = require('../common');
 
-function getFilename(version) {
+function getFilename() {
   switch (platform) {
     case 'darwin-x64':
       return 'mac64';
