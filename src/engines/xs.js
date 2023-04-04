@@ -9,15 +9,14 @@ const { platform, unzip } = require('../common');
 function getFilename(version) {
   switch (platform) {
     case 'darwin-x64':
-      return 'mac';
-    case 'linux-ia32':
-      return 'lin32';
+      return 'mac64';
+    case 'darwin-arm64':
+      return 'mac64arm';
     case 'linux-x64':
       return 'lin64';
+    case 'linux-arm64':
+      return 'lin64arm';
     case 'win32-x64':
-      if (parseInt(version, 10) < 11) {
-        return 'win';
-      }
       return 'win64';
     default:
       throw new Error(`No XS builds available for ${platform}`);
@@ -33,15 +32,14 @@ class XSInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const body = await fetch('https://api.github.com/repos/Moddable-OpenSource/moddable-xst/releases')
+      const body = await fetch('https://api.github.com/repos/Moddable-OpenSource/moddable/releases')
         .then((r) => r.json());
-      return body.find((b) => !b.prerelease).tag_name.slice(1);
+      return body.find((b) => !b.prerelease).tag_name;
     }
     return version;
   }
-
   getDownloadURL(version) {
-    return `https://github.com/Moddable-OpenSource/moddable-xst/releases/download/v${version}/xst-${getFilename(version)}.zip`;
+    return `https://github.com/Moddable-OpenSource/moddable/releases/download/${version}/xst-${getFilename(version)}.zip`;
   }
 
   extract() {
@@ -72,9 +70,9 @@ XSInstaller.config = {
   name: 'XS',
   id: 'xs',
   supported: [
-    'linux-ia32', 'linux-x64',
+    'linux-arm64', 'linux-x64',
     'win32-x64',
-    'darwin-x64',
+    'darwin-arm64', 'darwin-x64',
   ],
 };
 
