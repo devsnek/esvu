@@ -32,7 +32,9 @@ class QuickJSInstaller extends Installer {
 
   static resolveVersion(version) {
     if (['darwin-arm64', 'darwin-x64', 'linux-arm64'].includes(platform)) {
-      return '6.0.0';
+      return fetch('https://api.github.com/repos/napi-bindings/quickjs-build/releases')
+        .then((r) => r.json())
+        .then((b) => b[0].tag_name);
     }
     if (version === 'latest') {
       return fetch('https://bellard.org/quickjs/binary_releases/LATEST.json')
