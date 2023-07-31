@@ -1,6 +1,7 @@
 'use strict';
 
 const fetch = require('node-fetch');
+const { inspect } = require('util');
 const assert = require('assert');
 const execa = require('execa');
 const Installer = require('../installer');
@@ -72,9 +73,9 @@ class GraalJSInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const body = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
+      const releases = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
         .then((r) => r.json());
-      const versions = body
+      const versions = releases
         .filter((b) => !b.prerelease)
         .map((b) => GraalJSVersion.from(b.tag_name))
         .sort((a, b) => GraalJSVersion.compare(b, a));
@@ -87,7 +88,22 @@ class GraalJSInstaller extends Installer {
   }
 
   async getDownloadURL(version) {
-    return `https://github.com/oracle/graaljs/releases/download/vm-${version}/graaljs-${version}-${getFilename()}${getArchiveExtension()}`;
+    const assetName = `graaljs-${version}-${getFilename()}${getArchiveExtension()}`;
+    const releases = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
+      .then((r) => r.json());
+    for (const release of releases) {
+      // tag_name may be graal-${version} or vm-${version}
+      if (GraalJSVersion.compare(release.tag_name, version) === 0) {
+        for (const asset of release.assets) {
+          if (asset.name === assetName) {
+            // https://github.com/oracle/graaljs/releases/download/${release.tag_name}/${asset.name}
+            return asset.browser_download_url;
+          }
+        }
+        throw new Error(`Could not find asset '${assetName}' in release '${release.tag_name}'\nAvailable assets: ${inspect(release.assets.map((a) => a.name).filter((name) => name.endsWith(getArchiveExtension())))}`);
+      }
+    }
+    throw new Error(`Could not find release version '${version}'`);
   }
 
   async extract() {
