@@ -33,30 +33,15 @@ class SpiderMonkeyInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      // Build a request for buildhub2: https://buildhub2.readthedocs.io/en/latest/project.html
-      const body = {
-        size: 1,
-        sort: { 'build.id': 'desc' },
-        query: {
-          bool: {
-            must: [
-              { term: { 'source.product': 'firefox' } },
-              { term: { 'source.tree': 'mozilla-central' } },
-              { term: { 'target.channel': 'nightly' } },
-              { term: { 'target.platform': getFilename() } },
-            ],
-          },
-        },
-      };
-
-      const data = await fetch('https://buildhub.moz.tools/api/search', {
-        method: 'post',
-        body: JSON.stringify(body),
-      }).then((r) => r.json());
-
-      const source = data.hits.hits[0]._source;
-
-      return `${source.target.version}#${source.build.id}`;
+      const result = await fetch('https://product-details.mozilla.org/1.0/firefox_history_development_releases.json')
+        .then((r) => r.json());
+      const entries = Object.entries(result);
+      entries.sort(([, a], [, b]) => {
+        const aTime = new Date(a).getTime();
+        const bTime = new Date(b).getTime();
+        return bTime - aTime;
+      });
+      return entries[0][0];
     }
     return version;
   }
