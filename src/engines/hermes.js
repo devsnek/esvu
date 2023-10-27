@@ -14,6 +14,7 @@ function getFilename() {
     case 'linux-x64':
       return 'linux';
     case 'darwin-x64':
+    case 'darwin-arm64':
       return 'darwin';
     case 'win32-x64':
       return 'windows';

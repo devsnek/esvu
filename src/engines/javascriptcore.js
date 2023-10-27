@@ -21,8 +21,26 @@ const execa = require('execa');
 const Installer = require('../installer');
 const { platform, unzip } = require('../common');
 
-function buildURL(builder) {
-  return `https://build.webkit.org/api/v2/builders/${builder}/builds?limit=1&order=-number&property=got_revision&complete=true`;
+async function macName() {
+  const { default: macosRelease } = await import('macos-release');
+  return macosRelease().name.toLowerCase();
+}
+
+async function getVersionFromBuilder(builder) {
+  const url = `https://build.webkit.org/api/v2/builders/${builder}/builds?limit=1&order=-number&property=archive_revision&complete=true`;
+  const body = await fetch(url).then((r) => r.json());
+  return body.builds[0].properties.archive_revision[0].split('@')[0];
+}
+
+async function getMacBuilder() {
+  switch (await macName()) {
+    case 'ventura':
+      return 706;
+    case 'monterey':
+      return 368;
+    default:
+      throw new Error(`Unknown macOS release: ${macName()}`);
+  }
 }
 
 class JavaScriptCoreInstaller extends Installer {
@@ -44,21 +62,15 @@ class JavaScriptCoreInstaller extends Installer {
     if (version === 'latest') {
       switch (platform) {
         case 'linux-x64':
+        case 'linux-ia32':
           return fetch('https://webkitgtk.org/jsc-built-products/x86_64/release/LAST-IS')
             .then((r) => r.text())
-            .then((n) => n.trim().replace('.zip', ''));
-        case 'win32-x64': {
-          const body = await fetch(buildURL(27)).then((r) => r.json());
-          return body.builds[0].properties.got_revision[0];
-        }
-        case 'darwin-x64': {
-          const body = await fetch(buildURL(54)).then((r) => r.json());
-          return body.builds[0].properties.got_revision[0];
-        }
-        case 'darwin-arm64': {
-          const body = await fetch(buildURL(29)).then((r) => r.json());
-          return body.builds[0].properties.got_revision[0];
-        }
+            .then((n) => n.trim().replace('.zip', '').split('@')[0]);
+        case 'win32-x64':
+          return getVersionFromBuilder(27);
+        case 'darwin-x64':
+        case 'darwin-arm64':
+          return getVersionFromBuilder(await getMacBuilder());
         default:
           throw new RangeError(`Unknown platform ${platform}`);
       }
@@ -66,18 +78,17 @@ class JavaScriptCoreInstaller extends Installer {
     return version;
   }
 
-  getDownloadURL(version) {
+  async getDownloadURL(version) {
     switch (platform) {
       case 'darwin-x64':
-        return `https://s3-us-west-2.amazonaws.com/minified-archives.webkit.org/mac-catalina-x86_64-release/${version}.zip`;
       case 'darwin-arm64':
-        return `https://s3-us-west-2.amazonaws.com/minified-archives.webkit.org/mac-bigsur-x86_64%20arm64-release/${version}.zip`;
+        return `https://s3-us-west-2.amazonaws.com/minified-archives.webkit.org/mac-${await macName()}-x86_64%20arm64-release/${version}@main.zip`;
       case 'linux-ia32':
-        return `https://webkitgtk.org/jsc-built-products/x86_32/release/${version}.zip`;
+        return `https://webkitgtk.org/jsc-built-products/x86_32/release/${version}@main.zip`;
       case 'linux-x64':
-        return `https://webkitgtk.org/jsc-built-products/x86_64/release/${version}.zip`;
+        return `https://webkitgtk.org/jsc-built-products/x86_64/release/${version}@main.zip`;
       case 'win32-x64':
-        return `https://s3-us-west-2.amazonaws.com/archives.webkit.org/wincairo-x86_64-release/${version}.zip`;
+        return `https://s3-us-west-2.amazonaws.com/archives.webkit.org/wincairo-x86_64-release/${version}@main.zip`;
       default:
         throw new RangeError(`Unknown platform ${platform}`);
     }

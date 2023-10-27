@@ -10,6 +10,7 @@
     "extract-zip": "^2.0.1",
     "glob": "^7.1.6",
     "inquirer": "^7.3.3",
+    "macos-release": "^3.2.0",
     "node-fetch": "^2.6.1",
     "ora": "^4.1.1",
     "rimraf": "^3.0.2",
