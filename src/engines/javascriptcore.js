@@ -38,6 +38,8 @@ async function getMacBuilder() {
       return 706;
     case 'monterey':
       return 368;
+    case 'sonoma':
+      return 938;
     default:
       throw new Error(`Unknown macOS release: ${macName()}`);
   }
