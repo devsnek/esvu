@@ -33,7 +33,8 @@ async function getVersionFromBuilder(builder) {
 }
 
 async function getMacBuilder() {
-  switch (await macName()) {
+  const name = await macName();
+  switch (name) {
     case 'ventura':
       return 706;
     case 'monterey':
@@ -41,7 +42,7 @@ async function getMacBuilder() {
     case 'sonoma':
       return 938;
     default:
-      throw new Error(`Unknown macOS release: ${macName()}`);
+      throw new Error(`Unknown macOS release: ${name}. If it's a new version, consider making a pull request to https://github.com/devsnek/esvu.`);
   }
 }
 
