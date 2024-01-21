@@ -37,7 +37,6 @@ installing engines to make eshost automatically find the installed engines.
 | Engine             | Binary Names                     | `darwin-x64` | `darwin-arm64` | `linux-ia32` | `linux-x64` | `linux-arm64` | `win32-ia32` | `win32-x64` |
 | ------------------ | -------------------------------- | ------------ | -------------- | ------------ | ----------- | ------------- | ------------ | ----------- |
 | [Boa][]            | `boa`,                           | ✅           |                |              | ✅         |               |              | ✅          |
-| [Chakra][]         | `ch`, `chakra`                   | ✅           |                |              | ✅          |               | ✅           | ✅        |
 | [engine262][]      | `engine262`                      | ✅           | ✅             | ✅           | ✅          | ✅            | ✅           | ✅       |
 | [GraalJS][]        | `graaljs`                        | ✅           | ✅             |              | ✅          | ✅            |              | ✅        |
 | [Hermes][]         | `hermes`                         | ✅           | ✅             |              |             |               |              | ✅          |
@@ -53,7 +52,6 @@ Some binaries may be exposed as batch/shell scripts to properly handling shared 
 
 [Boa]: https://boajs.dev/
 [eshost-cli]: https://github.com/bterlson/eshost-cli
-[Chakra]: https://github.com/microsoft/chakracore
 [engine262]: https://engine262.js.org
 [GraalJS]: https://github.com/graalvm/graaljs
 [Hermes]: https://hermesengine.dev
