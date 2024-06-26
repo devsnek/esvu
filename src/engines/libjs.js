@@ -28,43 +28,43 @@ class LibJSInstaller extends Installer {
   }
 
   static async resolveVersion(version) {
-    const artifactName = `serenity-js-${getFilename()}`;
+    const artifactName = `ladybird-js-${getFilename()}`;
     if (version !== 'latest') {
       throw new Error('LibJS only provides binary builds for \'latest\'');
     }
 
-    const artifactId = await fetch('https://api.github.com/repos/serenityos/serenity/actions/artifacts')
+    const artifactId = await fetch('https://api.github.com/repos/ladybirdbrowser/ladybird/actions/artifacts')
       .then((x) => x.json())
       .then((x) => x.artifacts.filter((a) => a.name === artifactName))
       .then((x) => x[0].id)
       .catch(() => {
-        throw new Error(`Failed to find any releases for ${artifactName} on SerenityOS/serenity`);
+        throw new Error(`Failed to find any releases for ${artifactName} on LadybirdBrowser/ladybird`);
       });
-    const runId = await fetch('https://api.github.com/repos/serenityos/serenity/actions/runs?event=push&branch=master&status=success')
+    const runId = await fetch('https://api.github.com/repos/ladybirdbrowser/ladybird/actions/runs?event=push&branch=master&status=success')
       .then((x) => x.json())
       .then((x) => x.workflow_runs.filter((a) => a.name === 'Package the js repl as a binary artifact'))
       .then((x) => x.sort((a, b) => a.check_suite_id > b.check_suite_id))
       .then((x) => x[0].check_suite_id)
       .catch(() => {
-        throw new Error('Failed to find any recent serenity-js build');
+        throw new Error('Failed to find any recent ladybird-js build');
       });
     return `${runId}/${artifactId}`;
   }
 
   getDownloadURL(version) {
     const ids = version.split('/');
-    return `https://nightly.link/serenityos/serenity/suites/${ids[0]}/artifacts/${ids[1]}`;
+    return `https://nightly.link/ladybirdbrowser/ladybird/suites/${ids[0]}/artifacts/${ids[1]}`;
   }
 
   async extract() {
     await unzip(this.downloadPath, `${this.extractedPath}zip`);
-    await untar(path.join(`${this.extractedPath}zip`, `serenity-js-${getFilename()}.tar.gz`), this.extractedPath);
+    await untar(path.join(`${this.extractedPath}zip`, `ladybird-js-${getFilename()}.tar.gz`), this.extractedPath);
   }
 
   async install() {
     await this.registerAssets('lib/**');
     const js = await this.registerAsset('bin/js');
-    this.binPath = await this.registerScript('serenity-js', `"${js}"`);
+    this.binPath = await this.registerScript('ladybird-js', `"${js}"`);
   }
 
   async test() {
