@@ -62,7 +62,6 @@ class LibJSInstaller extends Installer {
   }
 
   async install() {
-    await this.registerAssets('lib/**');
     const js = await this.registerAsset('bin/js');
     this.binPath = await this.registerScript('ladybird-js', `"${js}"`);
   }
