@@ -34,12 +34,12 @@ class Engine262Installer extends Installer {
   }
 
   async install() {
-    const bin = path.join(this.installPath, 'package', 'bin', 'engine262.js');
+    const bin = path.join(this.installPath, 'package', 'lib', 'engine262.js');
     this.binPath = await this.registerBinarySymlink(bin, 'engine262');
   }
 
   async test() {
-    const program = 'print("42");';
+    const program = 'console.log("42");';
     const output = '42';
 
     assert.strictEqual(
