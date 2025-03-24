@@ -39,7 +39,7 @@ class Engine262Installer extends Installer {
   }
 
   async test() {
-    const program = 'console.log("42");';
+    const program = 'print("42");';
     const output = '42';
 
     assert.strictEqual(
