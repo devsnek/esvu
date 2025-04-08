@@ -10,14 +10,27 @@ const { platform } = require('../common');
 
 const binaryName = platform.startsWith('win') ? 'boa.exe' : 'boa';
 
-function getFilename() {
+function isNightly(version) {
+  return version.startsWith('nightly');
+}
+
+function getReleaseTag(version) {
+  return isNightly(version) ? 'nightly' : version;
+}
+
+function getFilename(version) {
   switch (platform) {
     case 'darwin-x64':
-      return 'boa-macos-amd64';
+      return isNightly(version) ? 'boa-x86_64-apple-darwin' : 'boa-macos-amd64';
     case 'linux-x64':
-      return 'boa-linux-amd64';
+      return isNightly(version) ? 'boa-x86_64-unknown-linux-gnu' : 'boa-linux-amd64';
     case 'win32-x64':
-      return 'boa-windows-amd64.exe';
+      return isNightly(version) ? 'boa-x86_64-pc-windows-msvc.exe' : 'boa-windows-amd64.exe';
+    case 'darwin-arm64':
+      if (isNightly(version)) {
+        return 'boa-aarch64-apple-darwin';
+      }
+      // fall through
     default:
       throw new Error(`No Boa builds available for ${platform}`);
   }
@@ -31,15 +44,18 @@ class BoaInstaller extends Installer {
 
   static resolveVersion(version) {
     if (version === 'latest') {
-      return fetch('https://api.github.com/repos/boa-dev/boa/releases/latest')
+      // Boa has nightly releases under the 'nightly' tag on GitHub, which are
+      // updated instead of making a new release for each one. Tag the version
+      // with the time the tag was last updated.
+      return fetch('https://api.github.com/repos/boa-dev/boa/releases/tags/nightly')
         .then((r) => r.json())
-        .then((r) => r.tag_name);
+        .then((r) => `nightly-${r.updated_at}`);
     }
     return version;
   }
 
   getDownloadURL(version) {
-    return `https://github.com/boa-dev/boa/releases/download/${version}/${getFilename()}`;
+    return `https://github.com/boa-dev/boa/releases/download/${getReleaseTag(version)}/${getFilename(version)}`;
   }
 
   async extract() {
@@ -75,6 +91,7 @@ BoaInstaller.config = {
     'linux-x64',
     'win32-x64',
     'darwin-x64',
+    'darwin-arm64',
   ],
 };
 
