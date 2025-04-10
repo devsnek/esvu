@@ -41,6 +41,8 @@ async function getMacBuilder() {
       return 368;
     case 'sonoma':
       return 938;
+    case 'sequoia':
+      return 1123;
     default:
       throw new Error(`Unsupported macOS release: ${name}`);
   }
