@@ -63,12 +63,12 @@ class LibJSInstaller extends Installer {
 
   async install() {
     const js = await this.registerAsset('bin/js');
-    this.binPath = await this.registerScript('ladybird-js', `"${js}"`);
+    this.binPath = await this.registerScript('ladybird-js', `"${js} --disable-string-quotes"`);
   }
 
   async test() {
-    const program = 'console.log("42")';
-    const output = '"42"';
+    const program = 'print("42")';
+    const output = '42';
 
     assert.strictEqual(
       (await execa(this.binPath, ['-c', program])).stdout,
