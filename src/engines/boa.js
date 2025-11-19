@@ -12,14 +12,12 @@ const binaryName = platform.startsWith('win') ? 'boa.exe' : 'boa';
 
 function getFilename() {
   switch (platform) {
-    case 'darwin-x64':
-      return 'boa-macos-amd64';
     case 'darwin-arm64':
       return 'boa-aarch64-apple-darwin';
     case 'linux-x64':
-      return 'boa-linux-amd64';
+      return 'boa-x86_64-unknown-linux-gnu';
     case 'win32-x64':
-      return 'boa-windows-amd64.exe';
+      return 'boa-x86_64-pc-windows-msvc.exe';
     default:
       throw new Error(`No Boa builds available for ${platform}`);
   }
