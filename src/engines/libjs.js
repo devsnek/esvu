@@ -11,10 +11,10 @@ function getFilename() {
   switch (platform) {
     case 'linux-x64':
       return 'Linux-x86_64';
-    case 'darwin-x64':
-      return 'macOS-universal2';
+    case 'linux-aarch64':
+      return 'Linux-aarch64';
     case 'darwin-arm64':
-      return 'macOS-universal2';
+      return 'macOS-arm64';
     default:
       throw new Error(`LibJS does not have binary builds for ${platform}`);
   }
