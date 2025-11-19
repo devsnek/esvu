@@ -14,6 +14,8 @@ function getFilename() {
   switch (platform) {
     case 'darwin-x64':
       return 'boa-macos-amd64';
+    case 'darwin-arm64':
+      return 'boa-aarch64-apple-darwin';
     case 'linux-x64':
       return 'boa-linux-amd64';
     case 'win32-x64':
