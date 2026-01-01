@@ -11,10 +11,8 @@ function getFilename() {
   switch (platform) {
     case 'linux-x64':
       return 'Linux-x86_64';
-    case 'darwin-x64':
-      return 'macOS-universal2';
     case 'darwin-arm64':
-      return 'macOS-universal2';
+      return 'macOS-arm64';
     default:
       throw new Error(`LibJS does not have binary builds for ${platform}`);
   }
@@ -35,25 +33,20 @@ class LibJSInstaller extends Installer {
 
     const artifactId = await fetch('https://api.github.com/repos/ladybirdbrowser/ladybird/actions/artifacts')
       .then((x) => x.json())
-      .then((x) => x.artifacts.filter((a) => a.name === artifactName))
-      .then((x) => x[0].id)
+      .then((x) => x.artifacts.find((a) => a.name === artifactName))
+      .then((x) => x.id)
       .catch(() => {
         throw new Error(`Failed to find any releases for ${artifactName} on LadybirdBrowser/ladybird`);
       });
-    const runId = await fetch('https://api.github.com/repos/ladybirdbrowser/ladybird/actions/runs?event=push&branch=master&status=success')
-      .then((x) => x.json())
-      .then((x) => x.workflow_runs.filter((a) => a.name === 'Package the js repl as a binary artifact'))
-      .then((x) => x.sort((a, b) => a.check_suite_id > b.check_suite_id))
-      .then((x) => x[0].check_suite_id)
-      .catch(() => {
-        throw new Error('Failed to find any recent ladybird-js build');
-      });
-    return `${runId}/${artifactId}`;
+    return `gh-actions-artifact-${artifactId}`;
   }
 
   getDownloadURL(version) {
-    const ids = version.split('/');
-    return `https://nightly.link/ladybirdbrowser/ladybird/suites/${ids[0]}/artifacts/${ids[1]}`;
+    if (version.startsWith('gh-actions-artifact-')) {
+      const artifactId = version.slice('gh-actions-artifact-'.length);
+      return `https://nightly.link/ladybirdbrowser/ladybird/actions/artifacts/${artifactId}.zip`;
+    }
+    throw new Error(`Unexpected version format for ${version}`);
   }
 
   async extract() {
@@ -62,7 +55,6 @@ class LibJSInstaller extends Installer {
   }
 
   async install() {
-    await this.registerAssets('lib/**');
     const js = await this.registerAsset('bin/js');
     this.binPath = await this.registerScript('ladybird-js', `"${js}"`);
   }
