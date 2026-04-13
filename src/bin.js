@@ -35,46 +35,52 @@ async function loadStatus(promptIfEmpty) {
     if (!status.installed) {
       status.installed = {};
     }
+    status.selectedEngines = status.selectedEngines.filter((id) =>
+      esvu.getInstaller(id));
   } catch {
+    status = {
+      selectedEngines: [],
+      installed: {},
+    };
+  }
+
+  // --engines=name1,...
+  // --engines=all
+  // --engines=all+name1,...
+  if (argv.engines) {
     let selectedEngines = [];
 
-    // --engines=name1,...
-    // --engines=all
-    // --engines=all+name1,...
-    if (argv.engines) {
-      if (argv.engines.startsWith('all')) {
-        selectedEngines = Object.keys(esvu.engines)
-          .filter((e) => esvu.engines[e].shouldInstallByDefault());
-        const additional = argv.engines.split('+')[1];
-        if (additional) {
-          selectedEngines.push(...additional.split(','));
-        }
-      } else {
-        selectedEngines = argv.engines.split(',');
+    if (argv.engines.startsWith('all')) {
+      selectedEngines = Object.keys(esvu.engines)
+        .filter((e) => esvu.engines[e].shouldInstallByDefault());
+      const additional = argv.engines.split('+')[1];
+      if (additional) {
+        selectedEngines.push(...additional.split(','));
       }
-    } else if (promptIfEmpty) {
-      ({ selectedEngines } = await inquirer.prompt({
-        name: 'selectedEngines',
-        type: 'checkbox',
-        message: 'Select engines to install',
-        choices: Object.keys(esvu.engines).map((e) => {
-          const engine = esvu.engines[e];
-          return {
-            name: engine.config.name,
-            value: engine.config.id,
-            checked: engine.shouldInstallByDefault(),
-          };
-        }),
-      }));
+    } else {
+      selectedEngines = argv.engines.split(',');
     }
 
     // eslint-disable-next-line no-use-before-define
-    selectedEngines = selectedEngines.map((e) => getInstaller(e, false).config.id);
+    status.selectedEngines = selectedEngines.map((e) => getInstaller(e, false).config.id);
+  }
 
-    status = {
-      selectedEngines,
-      installed: {},
-    };
+  if (status.selectedEngines.length === 0 && promptIfEmpty) {
+    const result = await inquirer.prompt({
+      name: 'selectedEngines',
+      type: 'checkbox',
+      message: 'Select engines to install',
+      choices: Object.keys(esvu.engines).map((e) => {
+        const engine = esvu.engines[e];
+        return {
+          name: engine.config.name,
+          value: engine.config.id,
+          checked: engine.shouldInstallByDefault(),
+        };
+      }),
+    });
+
+    status.selectedEngines = result.selectedEngines;
   }
 
   const onExit = () => {
@@ -101,7 +107,9 @@ function getInstaller(name, verifyInstalled) {
     logger.fatal(`Unknown engine: ${name}`);
     process.exit(1);
   }
-  if (verifyInstalled && !status.selectedEngines.includes(Installer.config.id)) {
+  if (
+    verifyInstalled && !status.selectedEngines.includes(Installer.config.id)
+  ) {
     logger.fatal(`${Installer.config.name} is not installed`);
     process.exit(1);
   }
@@ -148,7 +156,10 @@ async function updateAll() {
     try {
       await installEngine(engine);
     } catch (e) {
-      logger.fatal(`Fatal error installing ${getInstaller(engine).config.name}`, e);
+      logger.fatal(
+        `Fatal error installing ${getInstaller(engine).config.name}`,
+        e,
+      );
       process.exitCode = 1;
     }
   };

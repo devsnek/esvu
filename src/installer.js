@@ -9,7 +9,9 @@ const stream = require('stream');
 const path = require('path');
 const glob = require('glob');
 const fetch = require('node-fetch');
-const { ESVU_PATH, ensureDirectory, symlink, platform, rmdir } = require('./common');
+const { ESVU_PATH, ensureDirectory, symlink, platform, rmdir } = require(
+  './common',
+);
 const Logger = require('./logger');
 
 const DL_FILE_PREFIX = 'esvu-';
@@ -26,7 +28,11 @@ class EngineInstaller {
     this.isLatest = isLatest;
     this.downloadPath = undefined;
     this.extractedPath = undefined;
-    this.installPath = path.join(ESVU_PATH, 'engines', this.constructor.config.id);
+    this.installPath = path.join(
+      ESVU_PATH,
+      'engines',
+      this.constructor.config.id,
+    );
     if (!isLatest) {
       this.installPath += `-${version}`;
     }
@@ -36,16 +42,23 @@ class EngineInstaller {
   static async install(requestedVersion, status) {
     const logger = new Logger(this.config.name);
 
-    if (requestedVersion === 'latest' && !status.selectedEngines.includes(this.config.id)) {
+    if (
+      requestedVersion === 'latest'
+      && !status.selectedEngines.includes(this.config.id)
+    ) {
       status.selectedEngines.push(this.config.id);
     }
 
     logger.info('Checking version...');
 
     const version = await this.resolveVersion(requestedVersion);
-    const INSTALLED_ID = requestedVersion === 'latest' ? this.config.id : `${this.config.id}-${version}`;
-    if (status.installed[INSTALLED_ID]
-        && version === status.installed[INSTALLED_ID].version) {
+    const INSTALLED_ID = requestedVersion === 'latest'
+      ? this.config.id
+      : `${this.config.id}-${version}`;
+    if (
+      status.installed[INSTALLED_ID]
+      && version === status.installed[INSTALLED_ID].version
+    ) {
       logger.succeed('Up to date');
       return;
     }
@@ -53,7 +66,9 @@ class EngineInstaller {
     const installer = new this(version, requestedVersion === 'latest');
 
     if (this.config.externalRequirements) {
-      logger.warn('There are external requirements that may need to be installed:');
+      logger.warn(
+        'There are external requirements that may need to be installed:',
+      );
       this.config.externalRequirements.forEach((e) => {
         logger.warn(`  * ${e.name} - ${e.url}`);
       });
@@ -69,26 +84,31 @@ class EngineInstaller {
           throw new Error(`Got ${r.status}`);
         }
         const rURL = new URL(r.url);
-        const l = path.join(os.tmpdir(), DL_FILE_PREFIX + hash(url) + path.extname(rURL.pathname));
+        const l = path.join(
+          os.tmpdir(),
+          DL_FILE_PREFIX + hash(url) + path.extname(rURL.pathname),
+        );
         const sink = fs.createWriteStream(l);
         const progress = logger.progress(+r.headers.get('content-length'));
         await new Promise((resolve, reject) => {
           r.body
-            .pipe(new (class extends stream.Transform {
-              constructor(...args) {
-                super(...args);
-                this.count = 0;
-              }
-              _transform(chunk, encoding, cb) {
-                this.count += chunk.length;
-                progress.update(this.count);
-                this.push(chunk);
-                cb(null);
-              }
-              _flush(cb) {
-                cb(null);
-              }
-            })())
+            .pipe(
+              new (class extends stream.Transform {
+                constructor(...args) {
+                  super(...args);
+                  this.count = 0;
+                }
+                _transform(chunk, encoding, cb) {
+                  this.count += chunk.length;
+                  progress.update(this.count);
+                  this.push(chunk);
+                  cb(null);
+                }
+                _flush(cb) {
+                  cb(null);
+                }
+              })(),
+            )
             .pipe(sink)
             .once('error', reject)
             .once('finish', resolve);
@@ -116,7 +136,9 @@ class EngineInstaller {
       binEntries: installer.binEntries,
     };
 
-    logger.succeed(`Installed with bin entries: ${installer.binEntries.join(', ')}`);
+    logger.succeed(
+      `Installed with bin entries: ${installer.binEntries.join(', ')}`,
+    );
   }
 
   static async uninstall(version, status) {
@@ -127,7 +149,9 @@ class EngineInstaller {
       version = await this.resolveVersion(version);
     }
 
-    const INSTALLED_ID = version === 'latest' ? this.config.id : `${this.config.id}-${version}`;
+    const INSTALLED_ID = version === 'latest'
+      ? this.config.id
+      : `${this.config.id}-${version}`;
 
     // Delete bin entries and engine assets
     await Promise.all([
@@ -141,7 +165,10 @@ class EngineInstaller {
 
     // Remove from status.selectedEngines
     if (version === 'latest') {
-      status.selectedEngines.splice(status.selectedEngines.indexOf(this.config.id), 1);
+      status.selectedEngines.splice(
+        status.selectedEngines.indexOf(this.config.id),
+        1,
+      );
     }
 
     delete status.installed[INSTALLED_ID];
@@ -181,8 +208,10 @@ class EngineInstaller {
     if (files.length === 0) {
       throw new Error(`No files matched ${pattern}`);
     }
-    await Promise.all(files.map((file) =>
-      this.registerAsset(path.relative(this.extractedPath, file))));
+    await Promise.all(
+      files.map((file) =>
+        this.registerAsset(path.relative(this.extractedPath, file))),
+    );
   }
 
   async registerAsset(name) {

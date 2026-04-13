@@ -34,7 +34,11 @@ class V8Installer extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const body = await fetch(`https://storage.googleapis.com/chromium-v8/official/canary/v8-${getFilename(platform)}-rel-latest.json`)
+      const body = await fetch(
+        `https://storage.googleapis.com/chromium-v8/official/canary/v8-${
+          getFilename(platform)
+        }-rel-latest.json`,
+      )
         .then((r) => r.json());
       return body.version;
     }
@@ -43,14 +47,18 @@ class V8Installer extends Installer {
       // Assume exact version.
       return version;
     }
-    const header = await fetch(`https://raw.githubusercontent.com/v8/v8/${major}.${minor}-lkgr/include/v8-version.h`)
+    const header = await fetch(
+      `https://raw.githubusercontent.com/v8/v8/${major}.${minor}-lkgr/include/v8-version.h`,
+    )
       .then((r) => r.text());
     const match = /#define V8_BUILD_NUMBER (\d+)/.exec(header);
     return `${major}.${minor}.${match[1]}`;
   }
 
   async getDownloadURL(version) {
-    return `https://storage.googleapis.com/chromium-v8/official/canary/v8-${getFilename(platform)}-rel-${version}.zip`;
+    return `https://storage.googleapis.com/chromium-v8/official/canary/v8-${
+      getFilename(platform)
+    }-rel-${version}.zip`;
   }
 
   extract() {
@@ -60,14 +68,22 @@ class V8Installer extends Installer {
   async install() {
     await this.registerAsset('icudtl.dat');
     const snapshot = await this.registerAsset('snapshot_blob.bin');
-    const d8 = await this.registerAsset(platform.startsWith('win') ? 'd8.exe' : 'd8');
+    const d8 = await this.registerAsset(
+      platform.startsWith('win') ? 'd8.exe' : 'd8',
+    );
     if (this.version.split('.')[0] < 7) {
       await this.registerAsset('natives_blob.bin');
-      this.v8Path = await this.registerScript('v8', `\
+      this.v8Path = await this.registerScript(
+        'v8',
+        `\
 cd "${this.installPath}"
-./d8`);
+./d8`,
+      );
     } else {
-      this.v8Path = await this.registerScript('v8', `"${d8}" --snapshot_blob="${snapshot}"`);
+      this.v8Path = await this.registerScript(
+        'v8',
+        `"${d8}" --snapshot_blob="${snapshot}"`,
+      );
     }
   }
 
@@ -85,10 +101,14 @@ cd "${this.installPath}"
 V8Installer.config = {
   name: 'V8',
   id: 'v8',
+  url: 'https://v8.dev',
   supported: [
-    'linux-ia32', 'linux-x64',
-    'win32-ia32', 'win32-x64',
-    'darwin-x64', 'darwin-arm64',
+    'linux-ia32',
+    'linux-x64',
+    'win32-ia32',
+    'win32-x64',
+    'darwin-x64',
+    'darwin-arm64',
   ],
 };
 

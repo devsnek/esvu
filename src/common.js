@@ -8,7 +8,8 @@ const tar = require('tar');
 const rimraf = require('rimraf');
 
 const ESVU_PATH = (() => {
-  const NEW_ESVU_PATH = process.env.ESVU_PATH || path.join(process.env.XDG_DATA_HOME || os.homedir(), '.esvu');
+  const NEW_ESVU_PATH = process.env.ESVU_PATH
+    || path.join(process.env.XDG_DATA_HOME || os.homedir(), '.esvu');
   const OLD_ESVU_PATH = path.join(os.homedir(), '.esvu');
 
   try {

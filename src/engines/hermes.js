@@ -75,6 +75,7 @@ class HermesInstaller extends Installer {
 HermesInstaller.config = {
   name: 'Hermes',
   id: 'hermes',
+  url: 'https://hermesengine.dev',
   supported: ['win32-x64', 'darwin-x64'],
 };
 

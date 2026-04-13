@@ -52,6 +52,7 @@ class Engine262Installer extends Installer {
 Engine262Installer.config = {
   name: 'engine262',
   id: 'engine262',
+  url: 'https://engine262.js.org',
   externalRequirements: [
     {
       name: 'Node.js',

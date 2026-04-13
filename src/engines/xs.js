@@ -32,14 +32,18 @@ class XSInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const body = await fetch('https://api.github.com/repos/Moddable-OpenSource/moddable/releases')
+      const body = await fetch(
+        'https://api.github.com/repos/Moddable-OpenSource/moddable/releases',
+      )
         .then((r) => r.json());
       return body.find((b) => !b.prerelease).tag_name;
     }
     return version;
   }
   getDownloadURL(version) {
-    return `https://github.com/Moddable-OpenSource/moddable/releases/download/${version}/xst-${getFilename(version)}.zip`;
+    return `https://github.com/Moddable-OpenSource/moddable/releases/download/${version}/xst-${
+      getFilename(version)
+    }.zip`;
   }
 
   extract() {
@@ -69,9 +73,12 @@ class XSInstaller extends Installer {
 XSInstaller.config = {
   name: 'XS',
   id: 'xs',
+  url: 'https://www.moddable.com/',
   supported: [
-    'linux-arm64', 'linux-x64',
-    'darwin-arm64', 'darwin-x64',
+    'linux-arm64',
+    'linux-x64',
+    'darwin-arm64',
+    'darwin-x64',
   ],
 };
 

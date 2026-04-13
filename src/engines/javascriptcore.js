@@ -68,7 +68,9 @@ class JavaScriptCoreInstaller extends Installer {
       switch (platform) {
         case 'linux-x64':
         case 'linux-ia32':
-          return fetch('https://webkitgtk.org/jsc-built-products/x86_64/release/LAST-IS')
+          return fetch(
+            'https://webkitgtk.org/jsc-built-products/x86_64/release/LAST-IS',
+          )
             .then((r) => r.text())
             .then((n) => n.trim().replace('.zip', '').split('@')[0]);
         case 'win32-x64':
@@ -118,7 +120,9 @@ class JavaScriptCoreInstaller extends Installer {
       case 'linux-x64': {
         await this.registerAssets('lib/*');
         const jsc = await this.registerAsset('bin/jsc');
-        const source = `LD_LIBRARY_PATH="${this.installPath}/lib" exec "${this.installPath}/lib/ld-linux${platform === 'linux-x64' ? '-x86-64' : ''}.so.2" "${jsc}"`;
+        const source = `LD_LIBRARY_PATH="${this.installPath}/lib" exec "${this.installPath}/lib/ld-linux${
+          platform === 'linux-x64' ? '-x86-64' : ''
+        }.so.2" "${jsc}"`;
         this.binPath = await this.registerScript('javascriptcore', source);
         await this.registerScript('jsc', source);
         break;
@@ -152,12 +156,15 @@ class JavaScriptCoreInstaller extends Installer {
 JavaScriptCoreInstaller.config = {
   name: 'JavaScriptCore',
   id: 'jsc',
-  externalRequirements: platform.startsWith('win') ? [
-    {
-      name: 'WinCairoRequirements',
-      url: 'https://github.com/WebKitForWindows/WinCairoRequirements',
-    },
-  ] : undefined,
+  url: 'https://developer.apple.com/documentation/javascriptcore',
+  externalRequirements: platform.startsWith('win')
+    ? [
+      {
+        name: 'WinCairoRequirements',
+        url: 'https://github.com/WebKitForWindows/WinCairoRequirements',
+      },
+    ]
+    : undefined,
   supported: [
     'linux-x64',
     'win32-x64',

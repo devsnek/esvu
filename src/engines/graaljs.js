@@ -30,13 +30,16 @@ function getArchiveExtension() {
 
 class GraalJSVersion {
   constructor(tagName) {
-    const match = /((\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?.*)$/.exec(tagName);
+    const match = /((\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?.*)$/.exec(
+      tagName,
+    );
     if (match == null) {
       throw new Error(`Unable to parse version from tag name '${tagName}'`);
     }
     const [, fullVersion, ...parts] = match;
     this.fullVersion = fullVersion;
-    this.numParts = parts.filter((s) => s !== undefined).map((s) => parseInt(s, 10));
+    this.numParts = parts.filter((s) => s !== undefined).map((s) =>
+      parseInt(s, 10));
   }
 
   static from(a) {
@@ -46,7 +49,11 @@ class GraalJSVersion {
   static compare(a, b) {
     a = GraalJSVersion.from(a);
     b = GraalJSVersion.from(b);
-    for (let i = 0; i < Math.max(a.numParts.length, b.numParts.length); i += 1) {
+    for (
+      let i = 0;
+      i < Math.max(a.numParts.length, b.numParts.length);
+      i += 1
+    ) {
       const cmp = Math.sign((a.numParts[i] || 0) - (b.numParts[i] || 0));
       if (cmp !== 0) {
         return cmp;
@@ -73,7 +80,9 @@ class GraalJSInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const releases = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
+      const releases = await fetch(
+        'https://api.github.com/repos/oracle/graaljs/releases',
+      )
         .then((r) => r.json());
       const versions = releases
         .filter((b) => !b.prerelease)
@@ -89,7 +98,9 @@ class GraalJSInstaller extends Installer {
 
   async getDownloadURL(version) {
     const assetName = `graaljs-${version}-${getFilename()}${getArchiveExtension()}`;
-    const releases = await fetch('https://api.github.com/repos/oracle/graaljs/releases')
+    const releases = await fetch(
+      'https://api.github.com/repos/oracle/graaljs/releases',
+    )
       .then((r) => r.json());
     for (const release of releases) {
       // tag_name may be graal-${version} or vm-${version}
@@ -100,7 +111,14 @@ class GraalJSInstaller extends Installer {
             return asset.browser_download_url;
           }
         }
-        throw new Error(`Could not find asset '${assetName}' in release '${release.tag_name}'\nAvailable assets: ${inspect(release.assets.map((a) => a.name).filter((name) => name.endsWith(getArchiveExtension())))}`);
+        throw new Error(
+          `Could not find asset '${assetName}' in release '${release.tag_name}'\nAvailable assets: ${
+            inspect(
+              release.assets.map((a) => a.name).filter((name) =>
+                name.endsWith(getArchiveExtension())),
+            )
+          }`,
+        );
       }
     }
     throw new Error(`Could not find release version '${version}'`);
@@ -151,8 +169,13 @@ class GraalJSInstaller extends Installer {
 GraalJSInstaller.config = {
   name: 'GraalJS',
   id: 'graaljs',
+  url: 'https://github.com/graalvm/graaljs',
   supported: [
-    'linux-x64', 'win32-x64', 'darwin-x64', 'linux-arm64', 'darwin-arm64',
+    'linux-x64',
+    'win32-x64',
+    'darwin-x64',
+    'linux-arm64',
+    'darwin-arm64',
   ],
 };
 

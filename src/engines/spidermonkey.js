@@ -33,7 +33,9 @@ class SpiderMonkeyInstaller extends Installer {
 
   static async resolveVersion(version) {
     if (version === 'latest') {
-      const result = await fetch('https://product-details.mozilla.org/1.0/firefox_history_development_releases.json')
+      const result = await fetch(
+        'https://product-details.mozilla.org/1.0/firefox_history_development_releases.json',
+      )
         .then((r) => r.json());
       const entries = Object.entries(result);
       entries.sort(([, a], [, b]) => {
@@ -105,10 +107,14 @@ class SpiderMonkeyInstaller extends Installer {
 SpiderMonkeyInstaller.config = {
   name: 'SpiderMonkey',
   id: 'jsshell',
+  url: 'https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey',
   supported: [
-    'linux-ia32', 'linux-x64',
-    'win32-ia32', 'win32-x64',
-    'darwin-x64', 'darwin-arm64',
+    'linux-ia32',
+    'linux-x64',
+    'win32-ia32',
+    'win32-x64',
+    'darwin-x64',
+    'darwin-arm64',
   ],
 };
 

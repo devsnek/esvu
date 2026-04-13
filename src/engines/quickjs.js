@@ -76,9 +76,12 @@ class QuickJSInstaller extends Installer {
 QuickJSInstaller.config = {
   name: 'QuickJS',
   id: 'qjs',
+  url: 'https://bellard.org/quickjs/',
   supported: [
-    'linux-ia32', 'linux-x64',
-    'win32-ia32', 'win32-x64',
+    'linux-ia32',
+    'linux-x64',
+    'win32-ia32',
+    'win32-x64',
     'darwin-x64',
   ],
 };
