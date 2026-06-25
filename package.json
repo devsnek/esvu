@@ -6,6 +6,7 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "cli-progress": "^3.8.2",
+    "decompress": "^4.2.1",
     "execa": "^4.1.0",
     "extract-zip": "^2.0.1",
     "glob": "^7.1.6",

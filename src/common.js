@@ -3,7 +3,7 @@
 const os = require('os');
 const path = require('path');
 const fs = require('fs');
-const extractZip = require('extract-zip');
+const decompress = require('decompress');
 const tar = require('tar');
 const rimraf = require('rimraf');
 
@@ -64,7 +64,7 @@ function guessPlatform() {
 
 async function unzip(from, to) {
   await rmdir(to);
-  await extractZip(from, { dir: to });
+  await decompress(from, to);
 }
 
 async function untar(from, to) {
