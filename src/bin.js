@@ -66,7 +66,7 @@ async function loadStatus(promptIfEmpty) {
   }
 
   if (status.selectedEngines.length === 0 && promptIfEmpty) {
-    const result = await inquirer.prompt({
+    const result = await inquirer.default.prompt({
       name: 'selectedEngines',
       type: 'checkbox',
       message: 'Select engines to install',
